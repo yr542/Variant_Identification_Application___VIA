@@ -51,3 +51,4 @@ def filter_zyg(df, name, zyg):
 # filter out variants that are "Benign" or "Likely benign"
 def filter_benign(df):
 	df=df[(df["CLNSIG"].str.contains("enign")==False)]
+	return df
