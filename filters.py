@@ -1,4 +1,3 @@
-
 # filter the dataFrame (df) by the minimum allele depth (ad) in a particular
 # column (name)
 def filter_ADs(df, name, ad):
@@ -30,14 +29,14 @@ def filter_occurences(df, zyg, namestart, nameend, cap):
 
 # filter the dataFrame (df) by the maximum population allele frequency (cap)
 def filter_AF(df, cap):
-	AF_columns=["AF_popmax","PopFreqMax","GME_AF","Kaviar_AF","abraom_freq"]
-	AF_columns = AF_columns + [col + ".1" for col in AF_columns]
+    AF_columns=["AF_popmax","PopFreqMax","GME_AF","Kaviar_AF","abraom_freq"]
+    AF_columns = AF_columns + [col + ".1" for col in AF_columns]
 
-	for col in AF_columns:
-		if col in df.columns:
-			df.loc[df[col]==".",col]="-1"
-			df[col]=df[col].astype(float)
-			df=df[(df[col]<=cap)]
+    for col in AF_columns:
+            if col in df.columns:
+                    df.loc[df[col]==".",col]="-1"
+                    df[col]=df[col].astype(float)
+                    df=df[(df[col]<=cap)]
     print(len(df))
     return df
 
@@ -50,5 +49,5 @@ def filter_zyg(df, name, zyg):
 
 # filter out variants that are "Benign" or "Likely benign"
 def filter_benign(df):
-	df=df[(df["CLNSIG"].str.contains("enign")==False)]
-	return df
+    df=df[(df["CLNSIG"].str.contains("enign")==False)]
+    return df
