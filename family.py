@@ -5,7 +5,9 @@ class Family:
         self.ID = ID
         self.siblings = []
         self.mother=""
+        self.mother_phen=""
         self.father=""
+        self.father_phen=""
         self.child=""
 
 # Sibling class. Stores the string, sex, and phenotype for a sibling.
