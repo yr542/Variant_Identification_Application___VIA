@@ -51,3 +51,26 @@ def filter_zyg(df, name, zyg):
 def filter_benign(df):
     df=df[(df["CLNSIG"].str.contains("enign")==False)]
     return df
+
+# filters the dataFrame (df) by the maximum population allele frequency (cap),
+# but puts the candidate variants in a new data frame without changing the old one
+# and returns the new data frame (efficiency measure to maintain old data frame for
+# multiple models)
+def filter_AF_into_new_DataFrame(df, cap):
+    newdf = pd.DataFrame()
+    firstcol = 1
+    AF_columns = ["AF_popmax", "PopFreqMax", "GME_AF", "Kaviar_AF", "abraom_freq"]
+    AF_columns = AF_columns + [col + ".1" for col in AF_columns]
+
+    for col in AF_columns:
+        if firstcol == 1 and col in df.columns:
+            df.loc[df[col] == ".", col] = "-1"
+            df[col] = df[col].astype(float)
+            newdf = df[(df[col] <= cap)]
+            firstcol = 0
+        elif col in df.columns:
+            newdf.loc[newdf[col] == ".", col] = "-1"
+            newdf[col] = newdf[col].astype(float)
+            newdf = newdf[(newdf[col] <= cap)]
+
+    return newdf
