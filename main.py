@@ -45,5 +45,17 @@ if __name__ == '__main__':
 #            print(sibling.ID)
 
     df = pd.read_csv(args.data, sep='\t')
-#   for family in families.values():
-#         ...
+    
+    # The following code calls all 4 models and then outputs a csv file
+    # with the rows resulting for each one
+    result = pd.DataFrame()
+    
+    for family in families.values():
+        # result = pd.concat([result, MODEL_1_METHOD_NAME(df, family)])
+	    # result = pd.concat([result, MODEL_2_METHOD_NAME(df, family)])
+        result = pd.concat([result, de_novo_model(df, family)])
+        result = pd.concat([result, ad_model(df, family)])
+    
+    # organize result first by inh model and then by sample
+    result = result.sort_values(['inh model', 'sample'])
+    result.to_csv('filtered.csv')
