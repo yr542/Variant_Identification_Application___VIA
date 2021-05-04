@@ -50,3 +50,66 @@ def ad_model(df, fam):
     else:
         add_columns(newdf, fam, 4)
         return newdf
+
+# de_novo_model takes a dataframe (the cleaned data) and a family object
+# return value: a new dataframe with all possible de novo candidate
+# genes
+def de_novo_model(df, fam):
+
+    # re-filter for MAF
+    revised_df = filter_AF_into_new_DataFrame(df, .0005)
+    
+    # keep track of number of individuals we are identifying variants
+    # for
+    num_affected = 0
+
+    # If either mother or father is affected, no de novo, so return
+    # empty data frame
+    if fam.mother_phen == "Affected" or fam.father_phen == "Affected":
+        return pd.DataFrame()
+   
+    # filter child for all 0/1
+    if fam.child != "":
+        num_affected += 1
+        revised_df = filter_zyg(revised_df, fam.child, "0/1")
+        # TODO: filter for allelic depth
+
+        # check that no unaffected siblings are 0/1
+        de_novo_check_siblings(revised_df, fam)
+
+    # filter siblings to identify more candidate genes
+    for sib in fam.siblings:
+        if sib.phen == "Affected":
+            num_affected += 1
+            revised_df = filter_zyg(revised_df, fam.sib.ID, "0/1")
+            # TODO: filter for allelic depth
+            de_novo_check_siblings(revised_df, fam)
+            revised_df = pd.concat([revised_df, sib_df])
+    
+    if num_affected:
+
+        # add on the columns with family info
+        add_columns(revised_df, fam, 3)
+        return revised_df
+
+    # if no affected individuals, return empty data frame
+    return pd.DataFrame()
+
+# Checks to make sure that no sibling is unaffected and also 0/1
+def de_novo_check_siblings(df, fam):
+
+    # keep a list of rows to remove
+    to_remove = []
+    for i, row in df.iterrows():
+        errors = 0
+        for sib in fam.siblings:
+            
+	    # add to list to remove if sibling is Unaffected yet also
+	    # 0/1
+            if sib.phen != "Affected" and row[sib.ID] == "0/1":
+                errors += 1
+            if errors:
+                to_remove.append(i)
+    
+    # remove all bad rows
+    df.drop(index = to_remove)
