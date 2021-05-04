@@ -15,6 +15,17 @@ def filter_ADs(df, name, ad):
     print(len(df))
     return df
 
+# filter the dataFrame (df) by minimum depth in a particular column (name)
+def filter_DP(df, name, dp):
+    pd.options.mode.chained_assignment=None
+    strings = np.array(df[name])
+    DPindices=[s.split(":").index("DP") for s in df["FORMAT"]]
+    DPs=[int(strings[i].split(":")[DPindices[i]]) for i in range(len(strings))]
+    df["DP"]=DPs
+    df=df[df["DP"] > dp]
+    print(len(df))
+    return df
+
 # filter the dataFrame (df) by the maximum number of occurences (cap) of a
 # particular zygosity (zyg), e.g. "0/1", in a range of columns
 # [namestart,nameend]
