@@ -72,7 +72,7 @@ def filter_AF_into_new_DataFrame(df, cap):
         if firstcol == 1 and col in df.columns:
             df.loc[df[col] == ".", col] = "-1"
             df[col] = df[col].astype(float)
-            newdf = df[(df[col] <= cap)]
+            newdf = df[(df[col] <= cap)].copy()
             firstcol = 0
         elif col in df.columns:
             newdf.loc[newdf[col] == ".", col] = "-1"
