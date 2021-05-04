@@ -60,7 +60,9 @@ def de_novo_model(df, fam):
     if fam.child.ID != "":
         num_affected += 1
         revised_df = filter_zyg(revised_df, fam.child.ID, "0/1")
-        # TODO: filter for allelic depth
+        
+	# filter to make sure DP is at least 6x
+        revised_df = filter_DP(revised_df, fam.child.ID, 6)
 
         # check that no unaffected siblings are 0/1
         de_novo_check_siblings(revised_df, fam)
@@ -74,7 +76,7 @@ def de_novo_model(df, fam):
         if sib.phen == "Affected":
             num_affected += 1
             revised_df = filter_zyg(revised_df, fam.sib.ID, "0/1")
-            # TODO: filter for allelic depth
+            revised_df = filter_DP(revised_df, fam.sib.ID, 6)
             de_novo_check_siblings(revised_df, fam)
             revised_df = pd.concat([revised_df, sib_df])
     
