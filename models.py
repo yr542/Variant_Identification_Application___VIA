@@ -20,31 +20,19 @@ import pandas as pd
 def add_columns(df, fam, modelno):
     df.insert(0, "inh model", modelno)
     df.insert(1, "family", fam.ID)
-    df.insert(2, "sample", fam.child)
+    df.insert(2, "sample", fam.child.ID)
 
 #ad_model takes in a data frame and Family object and returns a new data frame
 #containing candidate variants
 def ad_model(df, fam):
-    min_allelic_depth = 1650 * 6
+    min_allelic_depth = 0.5 #1650 * 6
     numAffected = 0
     newdf = filter_AF_into_new_DataFrame(df, .0005)
-    if fam.mother_phen == "Affected":
-        numAffected += 1
-        filter_zyg(newdf, fam.mother, "0/1")
-        filter_ADs(newdf, fam.mother, min_allelic_depth)
-    if fam.father_phen == "Affected":
-        numAffected += 1
-        filter_zyg(newdf, fam.father, "0/1")
-        filter_ADs(newdf, fam.father, min_allelic_depth)
-    if fam.child != "":
-        numAffected += 1
-        filter_zyg(newdf, fam.child, "0/1")
-        filter_ADs(newdf, fam.child, min_allelic_depth)
-    for sib in fam.siblings:
-        if sib.phen == "Affected":
+    for person in fam.people:
+        if person.phen == "Affected":
             numAffected += 1
-            filter_zyg(newdf, sib.ID, "0/1")
-            filter_ADs(newdf, sib.ID, min_allelic_depth)
+            newdf=filter_zyg(newdf, person.ID, "0/1")
+            newdf=filter_ADs(newdf, person.ID, min_allelic_depth)
     if numAffected <= 1:
         return pd.DataFrame() #returns an empty Data Frame if nothing should be output for this model
     else:
@@ -65,17 +53,21 @@ def de_novo_model(df, fam):
 
     # If either mother or father is affected, no de novo, so return
     # empty data frame
-    if fam.mother_phen == "Affected" or fam.father_phen == "Affected":
+    if fam.mother.phen == "Affected" or fam.father.phen == "Affected":
         return pd.DataFrame()
    
     # filter child for all 0/1
-    if fam.child != "":
+    if fam.child.ID != "":
         num_affected += 1
-        revised_df = filter_zyg(revised_df, fam.child, "0/1")
+        revised_df = filter_zyg(revised_df, fam.child.ID, "0/1")
         # TODO: filter for allelic depth
 
         # check that no unaffected siblings are 0/1
         de_novo_check_siblings(revised_df, fam)
+
+    # filter parents for 0/0
+    revised_df = filter_zyg(revised_df, fam.father.ID, "0/0")
+    revised_df = filter_zyg(revised_df, fam.mother.ID, "0/0")
 
     # filter siblings to identify more candidate genes
     for sib in fam.siblings:
@@ -123,9 +115,9 @@ def cmpd_het_model(df, fam):
     # filter child for having 0/1 in 2 variants of the same gene
 
     # first create newdf to include all instances of child 0/1
-    if fam.child != "":
+    if fam.child.ID != "":
         num_affected += 1
-        newdf = filter_zyg(df, fam.child, "0/1")
+        newdf = filter_zyg(df, fam.child.ID, "0/1")
 
         # create gene array for children with 0/1
         # using gene names prior to any semicolons

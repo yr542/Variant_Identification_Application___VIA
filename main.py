@@ -1,6 +1,7 @@
 import argparse
 import pandas as pd
-import family
+from family import *
+from models import *
 
 if __name__ == '__main__':
     argp = argparse.ArgumentParser()
@@ -17,7 +18,7 @@ if __name__ == '__main__':
         #print(i)
         Fam_ID = pedDf["Family_ID"][i]
         if Fam_ID not in families.keys():
-            fam = family.Family(Fam_ID)
+            fam = Family(Fam_ID)
             families[Fam_ID]=fam
         else:
             fam = families.get(Fam_ID)
@@ -26,21 +27,20 @@ if __name__ == '__main__':
         status = pedDf["Status"][i]
         sex = pedDf["Sex"][i]
         phen = pedDf["Phenotype"][i]
+        newperson = Person(ID, sex, phen)
+        fam.people.append(newperson)
         if status == "Father":
-            fam.father=ID
-            fam.father_phen=phen
+            fam.father = newperson
         elif status == "Mother":
-            fam.mother=ID
-            fam.mother_phen=phen
+            fam.mother = newperson
         elif status == "Child":
-            fam.child=ID
+            fam.child = newperson
         elif status == "Sibling":
-            sibling = family.Sibling(ID, sex, phen)
-            fam.siblings.append(sibling)
+            fam.siblings.append(newperson)
 #    for family in families.values():
-#        print(family.father)
-#        print(family.mother)
-#        print(family.child)
+#        print(family.father.ID)
+#        print(family.mother.ID)
+#        print(family.child.ID)
 #        for sibling in family.siblings:
 #            print(sibling.ID)
 

@@ -1,3 +1,7 @@
+import pandas as pd
+import numpy as np
+
+
 # filter the dataFrame (df) by the minimum allele depth (ad) in a particular
 # column (name)
 def filter_ADs(df, name, ad):
