@@ -113,3 +113,41 @@ def de_novo_check_siblings(df, fam):
     
     # remove all bad rows
     df.drop(index = to_remove)
+
+
+def cmpd_het_model(df, fam):
+   
+    # keep track of individuals we are identifying variants for
+    num_affected = 0
+
+    # filter child for having 0/1 in 2 variants of the same gene
+
+    # first create newdf to include all instances of child 0/1
+    if fam.child != "":
+        num_affected += 1
+        newdf = filter_zyg(df, fam.child, "0/1")
+
+        # create gene array for children with 0/1
+        # using gene names prior to any semicolons
+        
+        gene_array=[]
+        i=0
+        partitioned_gene=0
+        for i in range(0, len(newdf)):
+            partitioned_gene=newdf["Gene.refGene"][i].partition(";")
+            gene_array += partitioned_gene[0]
+            i += 1
+            
+        # drop rows without duplicate genes (not cmpd het)
+        for i in range(0, len(newdf)):
+            if gene_array[i] != gene_array[i+1]:
+                newdf.drop(df.index[i])
+
+    
+    # add on the columns with family info
+    if num_affected:
+        add_columns(newdf, fam, 2)
+        return newdf
+
+    # if no affected individuals, return empty data frame
+    return pd.DataFrame()
