@@ -117,31 +117,28 @@ def cmpd_het_model(df, fam):
     # filter child for having 0/1 in 2 variants of the same gene
 
     # first create newdf to include all instances of child 0/1
-    if fam.child.ID != "":
+    if fam.child != "":
         num_affected += 1
-        newdf = filter_zyg(df, fam.child.ID, "0/1")
+        newdf = filter_zyg(df, fam.child, "0/1")
 
-        # create gene array for children with 0/1
-        # using gene names prior to any semicolons
+        # use Gene.refGene column to create new column in df with
+        # gene names (deals with semicolon issue)
         
-        gene_array=[]
-        i=0
         partitioned_gene=0
+        newdf['Gene'] = ''
         for i in range(0, len(newdf)):
             partitioned_gene=newdf["Gene.refGene"][i].partition(";")
-            gene_array += partitioned_gene[0]
-            i += 1
-            
-        # drop rows without duplicate genes (not cmpd het)
-        for i in range(0, len(newdf)):
-            if gene_array[i] != gene_array[i+1]:
-                newdf.drop(df.index[i])
-
+            newdf['Gene'][i]= partitioned_gene[0]
+        
+        # create new df with only duplicate genes for child with 0/1
+        # and delete the gene column we created
+        finaldf = newdf[newdf.duplicated(subset=['Gene'], keep=False)]
+        del finaldf['Gene']
     
     # add on the columns with family info
     if num_affected:
-        add_columns(newdf, fam, 2)
-        return newdf
+        add_columns(finaldf, fam, 2)
+        return finaldf
 
     # if no affected individuals, return empty data frame
     return pd.DataFrame()
