@@ -34,8 +34,7 @@ def ad_model(df, fam):
             newdf = filter_zyg(newdf, person.ID, "0/1")
             newdf = filter_DP(newdf, person.ID, min_allelic_depth)
         else:
-            newdf = exclude_zyg(newdf, person.ID, "0/1")
-            newdf = exclude_zyg(newdf, person.ID, "1/1")
+            newdf = filter_zyg(newdf, person.ID, "0/0")
     if numAffected <= 1:
         return pd.DataFrame()  # returns an empty Data Frame if nothing should be output for this model
     else:
