@@ -25,20 +25,20 @@ def add_columns(df, fam, modelno):
 #ad_model takes in a data frame and Family object and returns a new data frame
 #containing candidate variants
 def ad_model(df, fam):
-    min_allelic_depth = 6
+    min_allelic_depth = 6 #will filter for 6x coverage minimum
     numAffected = 0
-    newdf = filter_AF_into_new_DataFrame(df, .0005)
+    newdf = filter_AF_into_new_DataFrame(df, .0005) #filters all AF cols for entries <= .0005
     for person in fam.people:
         if person.phen == "Affected":
             numAffected += 1
-            newdf = filter_zyg(newdf, person.ID, "0/1")
-            newdf = filter_DP(newdf, person.ID, min_allelic_depth)
+            newdf = filter_zyg(newdf, person.ID, "0/1") #filters for 0/1 entries for affected individs
+            newdf = filter_DP(newdf, person.ID, min_allelic_depth) #filters for minimum DP
         else:
-            newdf = filter_zyg(newdf, person.ID, "0/0")
+            newdf = filter_zyg(newdf, person.ID, "0/0") #filters for 0/0 entries for unaffected individs
     if numAffected <= 1:
-        return pd.DataFrame()  # returns an empty Data Frame if nothing should be output for this model
+        return pd.DataFrame()  # returns an empty Data Frame if nothing should be output for this model (<= 1 affected individs)
     else:
-        add_columns(newdf, fam, 4)
+        add_columns(newdf, fam, 4) #adds on columns with family info
         return newdf
 
 # de_novo_model takes a dataframe (the cleaned data) and a family object
