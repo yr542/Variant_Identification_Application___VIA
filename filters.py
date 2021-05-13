@@ -63,6 +63,13 @@ def filter_zyg(df, name, zyg):
         df=df[df[name].str.contains(zyg)]
     return df
 
+# filter the dataFrame (df) to exclude a certain zygosity (zyg) in a particular
+# column (name)
+def exclude_zyg(df, name, zyg):
+    if name in df.columns:
+        df = df[~df[name].str.contains(zyg)]
+    return df
+
 # filter out variants that are "Benign" or "Likely benign"
 def filter_benign(df):
     df=df[(df["CLNSIG"].str.contains("enign")==False)]
