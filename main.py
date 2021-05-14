@@ -7,6 +7,7 @@ if __name__ == '__main__':
     argp = argparse.ArgumentParser()
     argp.add_argument('-p', '--pedfile', default="Test_Ped.txt")
     argp.add_argument('-d', '--data', default="Test_cleaned.txt")
+    argp.add_argument('-o', '--output', default="filtered.csv")
 
     args = argp.parse_args()
 
@@ -52,10 +53,10 @@ if __name__ == '__main__':
     
     for family in families.values():
         # result = pd.concat([result, MODEL_1_METHOD_NAME(df, family)])
-	result = pd.concat([result, cmpd_het_model(df, family)])
+        result = pd.concat([result, cmpd_het_model(df, family)])
         result = pd.concat([result, de_novo_model(df, family)])
         result = pd.concat([result, ad_model(df, family)])
     
     # organize result first by inh model and then by sample
     result = result.sort_values(['inh model', 'sample'])
-    result.to_csv('filtered.csv')
+    result.to_csv(args.output)
