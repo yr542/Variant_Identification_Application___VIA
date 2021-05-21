@@ -8,11 +8,11 @@ if __name__ == '__main__':
     argp.add_argument('-p', '--pedfile', default="Test_Ped.txt")
     argp.add_argument('-d', '--data', default="Test_cleaned.txt")
     argp.add_argument('-o', '--output', default="filtered.csv")
+    argp.add_argument('-f', '--family', default="")
 
     args = argp.parse_args()
 
     pedDf = pd.read_csv(args.pedfile,sep='\t')
-    print(pedDf)
 
     families = {}
     for i in range(0, len(pedDf)):
@@ -38,15 +38,19 @@ if __name__ == '__main__':
             fam.child = newperson
         elif status == "Sibling":
             fam.siblings.append(newperson)
-#    for family in families.values():
-#        print(family.father.ID)
-#        print(family.mother.ID)
-#        print(family.child.ID)
-#        for sibling in family.siblings:
-#            print(sibling.ID)
+
 
     df = pd.read_csv(args.data, sep='\t')
     
+    #csv with variants in one family
+    if args.family != "":
+        fam = families[args.family]
+        fam_variants = df.copy()
+        for person in fam.people:
+            filt = filter_zyg if person.phen == "Unaffected" else exclude_zyg
+            fam_variants = filt(fam_variants, person.ID, "0/0")
+        fam_variants.to_csv(fam.ID+".csv")
+
     # The following code calls all 4 models and then outputs a csv file
     # with the rows resulting for each one
     result = pd.DataFrame()
