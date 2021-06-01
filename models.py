@@ -22,23 +22,33 @@ def add_columns(df, fam, modelno):
     df.insert(1, "family", fam.ID)
     df.insert(2, "sample", fam.child.ID)
 
-#ad_model takes in a data frame and Family object and returns a new data frame
-#containing candidate variants
+# ad_model takes in a data frame and Family object and returns a new data frame
+# containing candidate variants
 def ad_model(df, fam):
-    min_allelic_depth = 6 #will filter for 6x coverage minimum
+    min_allelic_depth = 6  # will filter for 6x coverage minimum for at least one affected individ
     numAffected = 0
-    newdf = filter_AF_into_new_DataFrame(df, .0005) #filters all AF cols for entries <= .0005
+    newdf = filter_AF_into_new_DataFrame(df, .0005)  # filters all AF cols for entries <= .0005
+    dpdf = pd.DataFrame()
     for person in fam.people:
         if person.phen == "Affected":
             numAffected += 1
-            newdf = filter_zyg(newdf, person.ID, "0/1") #filters for 0/1 entries for affected individs
-            newdf = filter_DP(newdf, person.ID, min_allelic_depth) #filters for minimum DP
+            newdf = filter_zyg(newdf, person.ID, "0/1")  # filters for 0/1 entries for affected individs
+            if numAffected == 1: #entire if-else works to filter DP appropriately
+                dpdf = filter_DP_Max(newdf, person.ID, min_allelic_depth, 0) #saves low DP variants for future use
+                newdf = filter_DP(newdf, person.ID, min_allelic_depth) #filters for min DP for first affected individ
+            else: #makes sure if later affected individs have high enough DPs those variants are included in the output
+                  #even if the first affected individ had a low DP
+                dpdf2 = filter_DP(dpdf, person.ID, min_allelic_depth, 0)
+                newdf.append(dpdf2, ignore_index=True)
+                dpdf = filter_DP_Max(dpdf, person.ID, min_allelic_depth) #removes kept variants from dpdf
         else:
-            newdf = filter_zyg(newdf, person.ID, "0/0") #filters for 0/0 entries for unaffected individs
+            newdf = filter_zyg(newdf, person.ID, "0/0")  # filters for 0/0 entries for unaffected individs
+
+    # returns an empty Data Frame if nothing should be output for this model (<= 1 affected individs)
     if numAffected <= 1:
-        return pd.DataFrame()  # returns an empty Data Frame if nothing should be output for this model (<= 1 affected individs)
+        return pd.DataFrame()
     else:
-        add_columns(newdf, fam, 4) #adds on columns with family info
+        add_columns(newdf, fam, 4)  # adds on columns with family info
         return newdf
 
 # de_novo_model takes a dataframe (the cleaned data) and a family object
