@@ -16,15 +16,21 @@ def filter_ADs(df, name, ad):
     return df
 
 # filter the dataFrame (df) by minimum depth in a particular column (name)
-def filter_DP(df, name, dp):
+# if inplace is set to any integer other than 1, it will be filtered into a new data frame
+# by default, the function filters in place when the inplace arg is left out of the function call
+def filter_DP(df, name, dp, inplace=1):
     pd.options.mode.chained_assignment=None
     strings = np.array(df[name])
     DPindices=[s.split(":").index("DP") for s in df["FORMAT"]]
     DPs=[int(strings[i].split(":")[DPindices[i]]) for i in range(len(strings))]
     df["DP"]=DPs
-    df=df[df["DP"] > dp]
-    print(len(df))
-    return df
+    if inplace == 1:
+        df=df[df["DP"] >= dp]
+        print(len(df))
+        return df
+    else:
+        dfcopy = df[df["DP"] >= dp].copy()
+        return dfcopy
 
 # filter the dataFrame (df) by the maximum number of occurences (cap) of a
 # particular zygosity (zyg), e.g. "0/1", in a range of columns
@@ -98,3 +104,18 @@ def filter_AF_into_new_DataFrame(df, cap):
             newdf = newdf[(newdf[col] <= cap)]
 
     return newdf
+
+# filter the dataFrame (df) by MAXIMUM depth in a particular column (name)
+#if inplace is 1, it filters df in place; if option is not 1, it filters into a new data frame
+def filter_DP_Max(df, name, dp, inplace=1):
+    pd.options.mode.chained_assignment = None
+    strings = np.array(df[name])
+    DPindices = [s.split(":").index("DP") for s in df["FORMAT"]]
+    DPs = [int(strings[i].split(":")[DPindices[i]]) for i in range(len(strings))]
+    df["DP"] = DPs
+    if inplace == 1:
+        df = df[df["DP"] < dp]
+        return df
+    else:
+        dfcopy = df[df["DP"] < dp].copy()
+        return dfcopy
