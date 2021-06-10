@@ -4,8 +4,7 @@ import numpy as np
 
 # filter the dataFrame (df) by the minimum allele depth (ad) in a particular
 # column (name)
-def filter_ADs(df, name, ad):
-    pd.options.mode.chained_assignment=None
+def filter_AD(df, name, ad):
     strings=np.array(df[name])
     ADindices=[s.split(":").index("AD") for s in df["FORMAT"]]
     ADs=[strings[i].split(":")[ADindices[i]] for i in range(len(strings))]
@@ -19,13 +18,12 @@ def filter_ADs(df, name, ad):
 # if inplace is set to any integer other than 1, it will be filtered into a new data frame
 # by default, the function filters in place when the inplace arg is left out of the function call
 def filter_DP(df, name, dp, inplace=1):
-    pd.options.mode.chained_assignment=None
     strings = np.array(df[name])
     DPindices=[s.split(":").index("DP") for s in df["FORMAT"]]
     DPs=[int(strings[i].split(":")[DPindices[i]]) for i in range(len(strings))]
     df["DP"]=DPs
     if inplace == 1:
-        df=df[df["DP"] >= dp]
+        df=df[df["DP"] >= dp].copy()
         print(len(df))
         return df
     else:
@@ -58,7 +56,7 @@ def filter_AF(df, cap):
         if col in df.columns:
             df.loc[df[col]==".",col]="-1"
             df[col]=df[col].astype(float)
-            df=df[(df[col]<=cap)]
+            df=df[df[col]<=cap].copy()
     print(len(df))
     return df
 
@@ -81,34 +79,9 @@ def filter_benign(df):
     df=df[(df["CLNSIG"].str.contains("enign")==False)]
     return df
 
-# filters the dataFrame (df) by the maximum population allele frequency (cap),
-# but puts the candidate variants in a new data frame without changing the old one
-# and returns the new data frame (efficiency measure to maintain old data frame for
-# multiple models)
-def filter_AF_into_new_DataFrame(df, cap):
-    pd.options.mode.chained_assignment=None
-    newdf = pd.DataFrame()
-    firstcol = 1
-    AF_columns = ["AF_popmax", "PopFreqMax", "GME_AF", "Kaviar_AF", "abraom_freq"]
-    AF_columns = AF_columns + [col + ".1" for col in AF_columns]
-
-    for col in AF_columns:
-        if firstcol == 1 and col in df.columns:
-            df.loc[df[col] == ".", col] = "-1"
-            df[col] = df[col].astype(float)
-            newdf = df[(df[col] <= cap)].copy()
-            firstcol = 0
-        elif col in df.columns:
-            newdf.loc[newdf[col] == ".", col] = "-1"
-            newdf[col] = newdf[col].astype(float)
-            newdf = newdf[(newdf[col] <= cap)]
-
-    return newdf
-
 # filter the dataFrame (df) by MAXIMUM depth in a particular column (name)
 #if inplace is 1, it filters df in place; if option is not 1, it filters into a new data frame
 def filter_DP_Max(df, name, dp, inplace=1):
-    pd.options.mode.chained_assignment = None
     strings = np.array(df[name])
     DPindices = [s.split(":").index("DP") for s in df["FORMAT"]]
     DPs = [int(strings[i].split(":")[DPindices[i]]) for i in range(len(strings))]

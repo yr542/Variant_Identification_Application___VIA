@@ -27,7 +27,8 @@ def add_columns(df, fam, modelno):
 def ad_model(df, fam):
     min_allelic_depth = 6  # will filter for 6x coverage minimum for at least one affected individ
     numAffected = 0
-    newdf = filter_AF_into_new_DataFrame(df, .0005)  # filters all AF cols for entries <= .0005
+    newdf = df.copy()
+    newdf = filter_AF(newdf, .0005)  # filters all AF cols for entries <= .0005
     dpdf = pd.DataFrame()
     for person in fam.people:
         if person.phen == "Affected":
@@ -57,7 +58,8 @@ def ad_model(df, fam):
 def de_novo_model(df, fam):
 
     # re-filter for MAF
-    revised_df = filter_AF_into_new_DataFrame(df, .0005)
+    revised_df = df.copy()
+    revised_df = filter_AF(revised_df, .0005)
     
     # keep track of number of individuals we are identifying variants
     # for
@@ -130,7 +132,8 @@ def cmpd_het_model(df, fam):
     # first create newdf to include all instances of child 0/1
     if fam.child.ID != "":
         num_affected += 1
-        newdf = filter_zyg(df, fam.child.ID, "0/1")
+        newdf = df.copy()
+        newdf = filter_zyg(newdf, fam.child.ID, "0/1")
 	
         # use Gene.refGene column to create new column "Gene' with
         # gene names (deals with semicolon issue)
@@ -138,9 +141,7 @@ def cmpd_het_model(df, fam):
         newdf.loc[:,'Gene'] = ''
         newdf=newdf.dropna(subset=["Gene.refGene"])
         newdf = newdf.reset_index(drop=True)
-        for i in range(0, len(newdf)):
-            partitioned_gene=newdf["Gene.refGene"][i].partition(";")
-            newdf['Gene'][i]= partitioned_gene[0]
+        newdf['Gene'] = newdf["Gene.refGene"].copy().str.partition(";")[0]
         
         # create new df with only duplicate genes for child with 0/1
         # and delete the gene column we created
