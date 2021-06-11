@@ -11,6 +11,7 @@
 # The functions should take in the variant data frame and a Family object,
 # and output a data frame of possible variants.
 
+from family import Family
 from filters import *
 import pandas as pd
 
@@ -155,28 +156,14 @@ def cmpd_het_model(df, fam):
         return finaldf
 
 
-# ar_model takes the data frame and Family object. Returns: a new data frame containing
-# all possible autosomal recessive candidate genes
-def ar_model(df, fam):
-    min_allelic_depth = 0.5
-    numAffected = 0
-    newdf = filter_AF_into_new_DataFrame(df, .005)
-    for person in fam.people:
-        if person.phen == 'Affected':
-            numAffected += 1
-            newdf=filter_zyg(newdf, person.ID, '1/1')
-            newdf=filter_ADs(newdf, person.ID, min_allelic_depth)
-    if numAffected <=1:
-        return pd.DataFrame()
-    else:
-        add_columns(newdf, fam, 1)
-        return newdf
+
 
 
 def xl_model(df, fam):
     min_allelic_depth = 0.5
     numAffected = 0
-    x_df = filter_chr(df)
+    name = 'Chr'
+    x_df = filter_chr(df, name, chr)
     if fam.mother.phen == "Affected" or fam.father.phen == "Affected":
         return pd.DataFrame()
     # filter child for all 0/1
@@ -185,5 +172,24 @@ def xl_model(df, fam):
             numAffected += 1
             x_df = filter_zyg(x_df, fam.child.ID, "1/1")
 
-
-            
+# ar_model takes the data frame and Family object. Returns: a new data frame containing
+# all possible autosomal recessive candidate genes
+def ar_model(df, fam):
+    min_allelic_depth = 6  # will filter for 6x coverage minimum for at least one affected individ
+    numAffected = 0
+    newdf = df.copy()
+    newdf = filter_AF(newdf, .005) 
+    dpdf = pd.DataFrame()
+    for person in fam.people:
+        if person.phen == "Affected":
+            numAffected += 1
+            newdf = filter_zyg(newdf, person.ID, "1/1") 
+            if numAffected == 1: 
+                dpdf = filter_DP_Max(newdf, person.ID, min_allelic_depth, 0) #saves low DP variants for future use
+                newdf = filter_DP(newdf, person.ID, min_allelic_depth)
+    # returns an empty Data Frame if nothing should be output for this model (<= 1 affected individs)
+    if numAffected <= 1:
+        return pd.DataFrame()
+    else:
+        add_columns(newdf, fam, 1)  # adds on columns with family info
+        return newdf         
