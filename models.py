@@ -161,7 +161,7 @@ def cmpd_het_model(df, fam):
                 if(mom==0 or dad==0):
                     finaldf = finaldf[finaldf["Gene"]!=gene]
         # delete the gene column we created
-	del finaldf['Gene']
+        del finaldf['Gene']
 
         
     # add on the columns with family info
