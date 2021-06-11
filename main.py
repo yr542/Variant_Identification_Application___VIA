@@ -63,5 +63,5 @@ if __name__ == '__main__':
         result = pd.concat([result, ad_model(df, family)])
     
     # organize result first by inh model and then by sample
-    result = result.sort_values(['inh model', 'sample'])
+    result = result.sort_values(['sample', 'inh model'])
     result.to_csv(args.output)
