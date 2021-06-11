@@ -147,7 +147,19 @@ def cmpd_het_model(df, fam):
         # create new df with only duplicate genes for child with 0/1
         # and delete the gene column we created
         finaldf = newdf[newdf.duplicated(subset=['Gene'], keep=False)] 
+
+        if(fam.father.ID != "" and fam.mother.ID != ""):
+            genes = finaldf["Gene"].unique()
+            for gene in genes:
+                genedf = finaldf[finaldf["Gene"]==gene]
+                mom = sum(genedf[fam.mother.ID].str.contains("0/1") &
+                          genedf[fam.father.ID].str.contains("0/0"))
+                dad = sum(genedf[fam.mother.ID].str.contains("0/0") &
+                          genedf[fam.father.ID].str.contains("0/1"))
+                if(mom==0 or dad==0):
+                    finaldf = finaldf[finaldf["Gene"]!=gene]
         del finaldf['Gene']
+
         
     
     # add on the columns with family info
@@ -160,10 +172,11 @@ def cmpd_het_model(df, fam):
 
 
 def xl_model(df, fam):
+    newdf = df.copy()
     min_allelic_depth = 0.5
     numAffected = 0
     name = 'Chr'
-    x_df = filter_chr(df, name, chr)
+    x_df = filter_chr(newdf, name, "chrX")
     if fam.mother.phen == "Affected" or fam.father.phen == "Affected":
         return pd.DataFrame()
     # filter child for all 0/1
@@ -171,6 +184,8 @@ def xl_model(df, fam):
         if fam.child.sex == 'Male':
             numAffected += 1
             x_df = filter_zyg(x_df, fam.child.ID, "1/1")
+    add_columns(x_df, fam, 1)
+    return(x_df)
 
 # ar_model takes the data frame and Family object. Returns: a new data frame containing
 # all possible autosomal recessive candidate genes
@@ -188,8 +203,8 @@ def ar_model(df, fam):
                 dpdf = filter_DP_Max(newdf, person.ID, min_allelic_depth, 0) #saves low DP variants for future use
                 newdf = filter_DP(newdf, person.ID, min_allelic_depth)
     # returns an empty Data Frame if nothing should be output for this model (<= 1 affected individs)
-    if numAffected <= 1:
+    if numAffected < 1:
         return pd.DataFrame()
     else:
         add_columns(newdf, fam, 1)  # adds on columns with family info
-        return newdf         
+        return newdf

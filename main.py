@@ -56,7 +56,8 @@ if __name__ == '__main__':
     result = pd.DataFrame()
     
     for family in families.values():
-        # result = pd.concat([result, MODEL_1_METHOD_NAME(df, family)])
+        result = pd.concat([result, ar_model(df, family)])
+        result = pd.concat([result, xl_model(df, family)])
         result = pd.concat([result, cmpd_het_model(df, family)])
         result = pd.concat([result, de_novo_model(df, family)])
         result = pd.concat([result, ad_model(df, family)])
