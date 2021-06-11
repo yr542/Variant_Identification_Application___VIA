@@ -184,3 +184,6 @@ def xl_model(df, fam):
         if fam.child.sex == 'Male':
             numAffected += 1
             x_df = filter_zyg(x_df, fam.child.ID, "1/1")
+
+
+            
