@@ -153,3 +153,34 @@ def cmpd_het_model(df, fam):
     if num_affected:
         add_columns(finaldf, fam, 2)
         return finaldf
+
+
+# ar_model takes the data frame and Family object. Returns: a new data frame containing
+# all possible autosomal recessive candidate genes
+def ar_model(df, fam):
+    min_allelic_depth = 0.5
+    numAffected = 0
+    newdf = filter_AF_into_new_DataFrame(df, .005)
+    for person in fam.people:
+        if person.phen == 'Affected':
+            numAffected += 1
+            newdf=filter_zyg(newdf, person.ID, '1/1')
+            newdf=filter_ADs(newdf, person.ID, min_allelic_depth)
+    if numAffected <=1:
+        return pd.DataFrame()
+    else:
+        add_columns(newdf, fam, 1)
+        return newdf
+
+
+def xl_model(df, fam):
+    min_allelic_depth = 0.5
+    numAffected = 0
+    x_df = filter_chr(df)
+    if fam.mother.phen == "Affected" or fam.father.phen == "Affected":
+        return pd.DataFrame()
+    # filter child for all 0/1
+    if fam.child.ID != "":
+        if fam.child.sex == 'Male':
+            numAffected += 1
+            x_df = filter_zyg(x_df, fam.child.ID, "1/1")

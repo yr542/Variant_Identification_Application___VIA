@@ -92,3 +92,9 @@ def filter_DP_Max(df, name, dp, inplace=1):
     else:
         dfcopy = df[df["DP"] < dp].copy()
         return dfcopy
+
+# filter the dataFramd (df) if you only want to keep the rows in which the gene is
+# located in the X chromosome
+def filter_chr(df):
+    df[df['column']=='chrX']
+    return df
