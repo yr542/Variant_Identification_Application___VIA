@@ -11,7 +11,7 @@ def filter_AD(df, name, ad):
     ADs=[int(ad.split(",")[1])/max(int(ad.split(",")[0]),1) for ad in ADs]
     df["AD"]=ADs
     df=df[df["AD"]>ad]
-    print(len(df))
+    #print(len(df))
     return df
 
 # filter the dataFrame (df) by minimum depth in a particular column (name)
@@ -24,7 +24,7 @@ def filter_DP(df, name, dp, inplace=1):
     df["DP"]=DPs
     if inplace == 1:
         df=df[df["DP"] >= dp].copy()
-        print(len(df))
+        #print(len(df))
         return df
     else:
         dfcopy = df[df["DP"] >= dp].copy()
@@ -44,7 +44,7 @@ def filter_occurences(df, zyg, namestart, nameend, cap):
         if freqs[key]>cap:
             indices.append(key)
     df.drop(indices,inplace=True)
-    print(len(df))
+    #print(len(df))
     return df
 
 # filter the dataFrame (df) by the maximum population allele frequency (cap)
@@ -57,7 +57,7 @@ def filter_AF(df, cap):
             df.loc[df[col]==".",col]="-1"
             df[col]=df[col].astype(float)
             df=df[df[col]<=cap].copy()
-    print(len(df))
+    #print(len(df))
     return df
 
 # filter the dataFrame (df) for the zygosity (zyg), e.g. "0/1", in a particular
@@ -95,7 +95,7 @@ def filter_DP_Max(df, name, dp, inplace=1):
 
 # filter the dataFramd (df) if you only want to keep the rows in which the gene is
 # located in the X chromosome
-def filter_chr(df, name, chr):
+def filter_chr(df, name, chrom):
     if name in df.columns:
-        df=df[df[name].str.contains(chr)]
+        df=df[df[name].str.contains(chrom)]
     return df
