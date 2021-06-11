@@ -129,23 +129,25 @@ def cmpd_het_model(df, fam):
     # keep track of individuals we are identifying variants for
     num_affected = 0
 
-    # filter child for having 0/1 in 2 variants of the same gene
-    # first create newdf to include all instances of child 0/1
+    # filter child for having 0/1 in >=2 variants of the same gene
+	
+    # create newdf to include all instances of child 0/1
     if fam.child.ID != "":
         num_affected += 1
         newdf = df.copy()
         newdf = filter_zyg(newdf, fam.child.ID, "0/1")
 	
         # use Gene.refGene column to create new column "Gene' with
-        # gene names (deals with semicolon issue)
+        # gene names (deals with semicolon issue in some genes)
         partitioned_gene=0
         newdf.loc[:,'Gene'] = ''
         newdf=newdf.dropna(subset=["Gene.refGene"])
         newdf = newdf.reset_index(drop=True)
         newdf['Gene'] = newdf["Gene.refGene"].copy().str.partition(";")[0]
         
-        # create new df with only duplicate genes for child with 0/1
-        # and delete the gene column we created
+        # create new df where genes must meet the following criteria: 
+	# there must be at least 1 0/1 variant in mother that is not in father
+	# and at least 1 0/1 variant in father that is not in mother
         finaldf = newdf[newdf.duplicated(subset=['Gene'], keep=False)] 
 
         if(fam.father.ID != "" and fam.mother.ID != ""):
@@ -158,10 +160,10 @@ def cmpd_het_model(df, fam):
                           genedf[fam.father.ID].str.contains("0/1"))
                 if(mom==0 or dad==0):
                     finaldf = finaldf[finaldf["Gene"]!=gene]
-        del finaldf['Gene']
+        # delete the gene column we created
+	del finaldf['Gene']
 
         
-    
     # add on the columns with family info
     if num_affected:
         add_columns(finaldf, fam, 2)
