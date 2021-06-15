@@ -184,10 +184,29 @@ def xl_model(df, fam):
     # filter child for all 0/1
     if fam.child.ID != "":
         if fam.child.sex == 'Male':
-            numAffected += 1
-            x_df = filter_zyg(x_df, fam.child.ID, "1/1")
+            if fam.mother.ID == '0/1':
+                numAffected += 1
+                x_df = filter_zyg(x_df, fam.child.ID, "1/1")
     add_columns(x_df, fam, 1)
     return(x_df)
+
+def xldn_model(df, fam):
+    newdf = df.copy()
+    min_allelic_depth = 0.5
+    numAffected = 0
+    name = 'Chr'
+    x_df = filter_chr(newdf, name, "chrX")
+    if fam.mother.phen == "Affected" or fam.father.phen == "Affected":
+        return pd.DataFrame()
+    # filter child for all 0/1
+    if fam.child.ID != "":
+        if fam.child.sex == 'Male':
+            if fam.mother.ID == '0/0':
+                numAffected += 1
+                x_df = filter_zyg(x_df, fam.child.ID, "1/1")
+    add_columns(x_df, fam, 1)
+    return(x_df)
+    
 
 # ar_model takes the data frame and Family object. Returns: a new data frame containing
 # all possible autosomal recessive candidate genes
@@ -210,3 +229,4 @@ def ar_model(df, fam):
     else:
         add_columns(newdf, fam, 1)  # adds on columns with family info
         return newdf
+    

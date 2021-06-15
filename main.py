@@ -55,13 +55,16 @@ if __name__ == '__main__':
     # with the rows resulting for each one
     result = pd.DataFrame()
     
-    for family in families.values():
+    for family in families.value():
+        result = pd.concat([result, ad_model(df, family)])
         result = pd.concat([result, ar_model(df, family)])
         result = pd.concat([result, xl_model(df, family)])
-        result = pd.concat([result, cmpd_het_model(df, family)])
+        result = pd.concat([result, xldn_model(df, family)])
         result = pd.concat([result, de_novo_model(df, family)])
-        result = pd.concat([result, ad_model(df, family)])
+        result = pd.concat([result, cmpd_het_model(df, family)])
+    
     
     # organize result first by inh model and then by sample
     result = result.sort_values(['sample', 'inh model'])
     result.to_csv(args.output)
+    print(result)
