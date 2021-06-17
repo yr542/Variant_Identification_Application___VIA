@@ -105,14 +105,11 @@ def filter_DP_Max(df, names, dp, inplace=1):
 
 # filter the dataFramd (df) if you only want to keep the rows in which the gene is
 # located in a particular chromosome (chrom)
-def filter_chr(df, chrom):
+def filter_chr(df, chrom, exclude = False):
     if "Chr" in df.columns:
-        df=df[df["Chr"].str.contains(chrom)]
+        if exclude:
+            df=df[~df["Chr"].str.contains(chrom)]
+        else:
+            df=df[df["Chr"].str.contains(chrom)]
     return df
 
-# filter the dataFrame (df) for variants that are either not on the X chromosome or
-# are on the X chromosome but the individual (name) does not have the variant.
-def exclude_hemizygous(df, name):
-    if "Chr" in df.columns and name in df.columns:
-        df=df[(df["Chr"].str.contains("chrX")==False) | (df[name].str.contains("1/1")==False)]
-    return df

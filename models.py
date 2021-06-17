@@ -184,6 +184,7 @@ def ar_model(df, fam):
     numAffected = 0
     newdf = df.copy()
     newdf = filter_AF(newdf, .005) 
+    newdf = filter_chr(newdf, "chrX", exclude=True)
     dpdf = pd.DataFrame()
     names = []
     for person in fam.people:
@@ -191,8 +192,6 @@ def ar_model(df, fam):
             names.append(person.ID)
             numAffected += 1
             newdf = filter_zyg(newdf, person.ID, "1/1") 
-            if person.sex == "Male":
-                newdf = exclude_hemizygous(newdf, person.ID)
         if person.phen != "Affected":
             newdf = exclude_zyg(newdf, person.ID, "1/1")
             if person == fam.father or person == fam.mother:
