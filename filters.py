@@ -25,9 +25,11 @@ def filter_DP(df, name, dp, inplace=1):
     if inplace == 1:
         df=df[df["DP"] >= dp].copy()
         #print(len(df))
+        del df["DP"]
         return df
     else:
         dfcopy = df[df["DP"] >= dp].copy()
+        del dfcopy["DP"]
         return dfcopy
 
 # filter the dataFrame (df) by the maximum number of occurences (cap) of a
@@ -79,23 +81,38 @@ def filter_benign(df):
     df=df[(df["CLNSIG"].str.contains("enign")==False)]
     return df
 
-# filter the dataFrame (df) by MAXIMUM depth in a particular column (name)
-#if inplace is 1, it filters df in place; if option is not 1, it filters into a new data frame
-def filter_DP_Max(df, name, dp, inplace=1):
-    strings = np.array(df[name])
-    DPindices = [s.split(":").index("DP") for s in df["FORMAT"]]
-    DPs = [int(strings[i].split(":")[DPindices[i]]) for i in range(len(strings))]
-    df["DP"] = DPs
+# filter the dataFrame (df) for variants with a maximum DP across a list of affected people (names)
+# that is greater than the minimum value (dp), a given constant.
+# if inplace is 1, it filters df in place; if option is not 1, it filters into a new data frame
+def filter_DP_Max(df, names, dp, inplace=1):
+    DPlist = [] 
+    for name in names:
+        strings = np.array(df[name])
+        DPindices=[s.split(":").index("DP") for s in df["FORMAT"]]
+        DPlist.append([int(strings[i].split(":")[DPindices[i]]) for i in range(len(strings))])
+    DPs = np.max(DPlist, 0)
+    df["DP"]=DPs
+
     if inplace == 1:
-        df = df[df["DP"] < dp]
+        df=df[df["DP"] >= dp].copy()
+        #print(len(df))
+        del df["DP"]
         return df
     else:
-        dfcopy = df[df["DP"] < dp].copy()
+        dfcopy = df[df["DP"] >= dp].copy()
+        del dfcopy["DP"]
         return dfcopy
 
 # filter the dataFramd (df) if you only want to keep the rows in which the gene is
-# located in the X chromosome
-def filter_chr(df, name, chrom):
-    if name in df.columns:
-        df=df[df[name].str.contains(chrom)]
+# located in a particular chromosome (chrom)
+def filter_chr(df, chrom):
+    if "Chr" in df.columns:
+        df=df[df["Chr"].str.contains(chrom)]
+    return df
+
+# filter the dataFrame (df) for variants that are either not on the X chromosome or
+# are on the X chromosome but the individual (name) does not have the variant.
+def exclude_hemizygous(df, name):
+    if "Chr" in df.columns and name in df.columns:
+        df=df[(df["Chr"].str.contains("chrX")==False) | (df[name].str.contains("1/1")==False)]
     return df

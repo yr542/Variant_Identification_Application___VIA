@@ -55,7 +55,7 @@ if __name__ == '__main__':
     # with the rows resulting for each one
     result = pd.DataFrame()
     
-    for family in families.value():
+    for family in families.values():
         result = pd.concat([result, ad_model(df, family)])
         result = pd.concat([result, ar_model(df, family)])
         result = pd.concat([result, xl_model(df, family)])
