@@ -55,13 +55,27 @@ if __name__ == '__main__':
     # with the rows resulting for each one
     result = pd.DataFrame()
     
-    for family in families.values():
-        result = pd.concat([result, ad_model(df, family)])
-        result = pd.concat([result, ar_model(df, family)])
-        result = pd.concat([result, xl_model(df, family)])
-        result = pd.concat([result, xldn_model(df, family)])
-        result = pd.concat([result, de_novo_model(df, family)])
-        result = pd.concat([result, cmpd_het_model(df, family)])
+    for fam in families.values():
+        subfamilies = [fam]
+        for person in fam.people:
+            if person.affected and person != fam.child:
+                subfamily = Family(fam.ID)
+                subfamily.child = person
+                opposite = ""
+                if person == fam.father or person == fam.mother:
+                    opposite = fam.mother if person == fam.father else fam.father
+                for p in fam.people:
+                    if p != opposite:
+                        subfamily.people.append(p)
+                subfamilies.append(subfamily)
+
+        for subfam in subfamilies:
+            result = pd.concat([result, ad_model(df, subfam)])
+            result = pd.concat([result, ar_model(df, subfam)])
+            result = pd.concat([result, xl_model(df, subfam)])
+            result = pd.concat([result, xldn_model(df, subfam)])
+            result = pd.concat([result, de_novo_model(df, subfam)])
+            result = pd.concat([result, cmpd_het_model(df, subfam)])
     
     
     # organize result first by inh model and then by sample
