@@ -71,13 +71,33 @@ if __name__ == '__main__':
                         subfamily.people.append(p)
                 subfamilies.append(subfamily)
 
+        famresult = pd.DataFrame()
         for subfam in subfamilies:
-            result = pd.concat([result, ad_model(df, subfam)])
-            result = pd.concat([result, ar_model(df, subfam)])
-            result = pd.concat([result, xl_model(df, subfam)])
-            result = pd.concat([result, xldn_model(df, subfam)])
-            result = pd.concat([result, de_novo_model(df, subfam)])
-            result = pd.concat([result, cmpd_het_model(df, subfam)])
+            famresult = pd.concat([famresult, ad_model(df, subfam)])
+            famresult = pd.concat([famresult, ar_model(df, subfam)])
+            famresult = pd.concat([famresult, xl_model(df, subfam)])
+            famresult = pd.concat([famresult, xldn_model(df, subfam)])
+            famresult = pd.concat([famresult, de_novo_model(df, subfam)])
+            famresult = pd.concat([famresult, cmpd_het_model(df, subfam)])
+        famresult["loc"] = [chrom+str(start)+str(end) for chrom, start,end in zip(famresult['Chr'], famresult['Start'], famresult["End"])]
+        uniquelocs = famresult["loc"].unique()
+        combined = pd.DataFrame()
+        for loc in uniquelocs:
+            rows = famresult[famresult["loc"]==loc]
+            output = rows.head(1).copy()
+            samplestring = ""
+            for sample in rows["sample"]:
+                samplestring += sample+","
+            samplestring = samplestring[:-1] #remove last comma
+            modelstring = ""
+            for model in rows["inh model"]:
+                modelstring += model+","
+            modelstring = modelstring[:-1] #remove last comma
+            output["sample"] = [samplestring]
+            output["inh model"] = [modelstring]
+            del(output["loc"])
+            combined = pd.concat([combined,output])
+        result = pd.concat([result, combined])
     
     
     # organize result first by inh model and then by sample
