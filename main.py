@@ -53,11 +53,12 @@ if __name__ == '__main__':
             fam_variants = filt(fam_variants, person.ID, "0/0")
         fam_variants.to_csv(fam.ID+".csv")
 
-    # The following code calls all 4 models and then outputs a csv file
-    # with the rows resulting for each one
+    #empty dataframe to hold output
     result = pd.DataFrame()
     
     for fam in families.values():
+
+        #generate a list of subfamilies centered on each affected individual
         subfamilies = [fam]
         for person in fam.people:
             if person.affected and person != fam.child:
@@ -66,12 +67,22 @@ if __name__ == '__main__':
                 opposite = ""
                 if person == fam.father or person == fam.mother:
                     opposite = fam.mother if person == fam.father else fam.father
+                if person in fam.siblings:
+                    if fam.hasFather:
+                        subfamily.father = fam.father
+                        subfamily.hasFather = True
+                    if fam.hasMother:
+                        subfamily.mother = fam.mother
+                        subfamily.hasMother = True
+                    subfamily.siblings = fam.siblings + [fam.child]
                 for p in fam.people:
                     if p != opposite:
                         subfamily.people.append(p)
                 subfamilies.append(subfamily)
 
+        #empty dataframe for results in this family
         famresult = pd.DataFrame()
+        #add model results for each subfamily
         for subfam in subfamilies:
             famresult = pd.concat([famresult, ad_model(df, subfam)])
             famresult = pd.concat([famresult, ar_model(df, subfam)])
@@ -79,6 +90,8 @@ if __name__ == '__main__':
             famresult = pd.concat([famresult, xldn_model(df, subfam)])
             famresult = pd.concat([famresult, de_novo_model(df, subfam)])
             famresult = pd.concat([famresult, cmpd_het_model(df, subfam)])
+
+        #combine multiple instances of the same variant into one row
         famresult["loc"] = [chrom+str(start)+str(end) for chrom, start,end in zip(famresult['Chr'], famresult['Start'], famresult["End"])]
         uniquelocs = famresult["loc"].unique()
         combined = pd.DataFrame()
