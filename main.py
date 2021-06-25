@@ -74,7 +74,9 @@ if __name__ == '__main__':
                     if fam.hasMother:
                         subfamily.mother = fam.mother
                         subfamily.hasMother = True
-                    subfamily.siblings = fam.siblings + [fam.child]
+                    newsibs = fam.siblings.copy()
+                    newsibs.remove(person)
+                    subfamily.siblings = newsibs + [fam.child]
                 for p in fam.people:
                     if p != opposite:
                         subfamily.people.append(p)
