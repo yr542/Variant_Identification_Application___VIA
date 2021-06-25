@@ -15,3 +15,7 @@ class Person:
         self.ID = ID
         self.sex = sex
         self.phen = phen
+        self.affected = self.phen == "Affected"
+        self.unaffected = self.phen == "Unaffected"
+        self.male = self.sex == "Male"
+        self.female = self.sex == "Female"

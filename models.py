@@ -33,7 +33,7 @@ def ad_model(df, fam):
     dpdf = pd.DataFrame()
     names = []
     for person in fam.people:
-        if person.phen == "Affected":
+        if person.affected:
             names.append(person.ID)
             numAffected += 1
             newdf = filter_zyg(newdf, person.ID, "0/1")  # filters for 0/1 entries for affected individs
@@ -63,7 +63,9 @@ def de_novo_model(df, fam):
 
     # If either mother or father is affected, no de novo, so return
     # empty data frame
-    if fam.mother.phen == "Affected" or fam.father.phen == "Affected":
+    if fam.mother.affected or fam.father.affected:
+        return pd.DataFrame()
+    if fam.mother.ID == "" and fam.father.ID == "":
         return pd.DataFrame()
    
     # filter child for all 0/1
@@ -80,7 +82,7 @@ def de_novo_model(df, fam):
 
     # filter siblings to identify more candidate genes
     for sib in fam.siblings:
-        if sib.phen == "Affected":
+        if sib.affected:
             num_affected += 1
             revised_df = filter_zyg(revised_df, sib.ID, "0/1")
             revised_df = filter_DP(revised_df, sib.ID, 6)
@@ -121,16 +123,27 @@ def cmpd_het_model(df, fam):
 	# there must be at least 1 0/1 variant in mother that is not in father
 	# and at least 1 0/1 variant in father that is not in mother
         finaldf = newdf[newdf.duplicated(subset=['Gene'], keep=False)] 
-        if(fam.father.ID != "" and fam.mother.ID != ""):
+        father_available = fam.father.ID != "" 
+        mother_available = fam.mother.ID != ""
+        if(father_available or mother_available):
             genes = finaldf["Gene"].unique()
+            both_available = father_available and mother_available
+            if not both_available:
+                available_ID = fam.father.ID if father_available else fam.mother.ID
             for gene in genes:
                 genedf = finaldf[finaldf["Gene"]==gene]
-                mom = sum(genedf[fam.mother.ID].str.contains("0/1") &
-                          genedf[fam.father.ID].str.contains("0/0"))
-                dad = sum(genedf[fam.mother.ID].str.contains("0/0") &
-                          genedf[fam.father.ID].str.contains("0/1"))
-                if(mom==0 or dad==0):
-                    finaldf = finaldf[finaldf["Gene"]!=gene]
+                if(both_available):
+                    mom = sum(genedf[fam.mother.ID].str.contains("0/1") &
+                              genedf[fam.father.ID].str.contains("0/0"))
+                    dad = sum(genedf[fam.mother.ID].str.contains("0/0") &
+                              genedf[fam.father.ID].str.contains("0/1"))
+                    if(mom==0 or dad==0):
+                        finaldf = finaldf[finaldf["Gene"]!=gene]
+                else:
+                    parentvariants = sum(genedf[available_ID].str.contains("0/1"))
+                    parentnonvariants = sum(genedf[available_ID].str.contains("0/0"))
+                    if(parentvariants == 0 or parentnonvariants == 0):
+                        finaldf = finaldf[finaldf["Gene"]!=gene]
 
         # delete the gene column we created
         del finaldf['Gene']
@@ -144,15 +157,15 @@ def xl_model(df, fam):
     newdf = df.copy()
     x_df = filter_chr(newdf, "chrX")
     for person in fam.people:
-        if person.phen == "Affected":
-            if person.sex != "Male":
+        if person.affected:
+            if not person.male:
                 return pd.DataFrame()
             x_df = filter_zyg(x_df, person.ID, "1/1")
-        if person.phen == "Unaffected":
+        if person.unaffected:
             x_df = exclude_zyg(x_df, person.ID, "1/1")
-            if person.sex == "Male":
+            if person.male:
                 x_df = filter_zyg(x_df, person.ID, "0/0")
-    if fam.father.phen != "Affected":
+    if not fam.father.affected:
         x_df = filter_zyg(x_df, fam.mother.ID, "0/1")
 
     add_columns(x_df, fam, "xl")
@@ -161,17 +174,17 @@ def xl_model(df, fam):
 def xldn_model(df, fam):
     newdf = df.copy()
     x_df = filter_chr(newdf, "chrX")
-    if fam.mother.phen == "Affected" or fam.father.phen == "Affected":
+    if fam.mother.affected or fam.father.affected:
         return pd.DataFrame()
-    if fam.child.sex == 'Female':
+    if fam.child.female:
         return pd.DataFrame()
     # filter child for all 0/1
     for person in fam.people:
-        if person.phen == "Affected":
-            if person.sex != "Male":
+        if person.affected:
+            if not person.male:
                 return pd.DataFrame()
             x_df = filter_zyg(x_df, person.ID, "1/1")
-        if person.phen == "Unaffected":
+        if person.unaffected:
             x_df = filter_zyg(x_df, person.ID, "0/0")
     add_columns(x_df, fam, "xldn")
     return(x_df)
@@ -188,11 +201,11 @@ def ar_model(df, fam):
     dpdf = pd.DataFrame()
     names = []
     for person in fam.people:
-        if person.phen == "Affected":
+        if person.affected:
             names.append(person.ID)
             numAffected += 1
             newdf = filter_zyg(newdf, person.ID, "1/1") 
-        if person.phen != "Affected":
+        else:
             newdf = exclude_zyg(newdf, person.ID, "1/1")
             if person == fam.father or person == fam.mother:
                 newdf = filter_zyg(newdf, person.ID, "0/1")
