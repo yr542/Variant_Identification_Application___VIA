@@ -32,8 +32,10 @@ if __name__ == '__main__':
         fam.people.append(newperson)
         if status == "Father":
             fam.father = newperson
+            fam.hasFather = True
         elif status == "Mother":
             fam.mother = newperson
+            fam.hasMother = True
         elif status == "Child":
             fam.child = newperson
         elif status == "Sibling":

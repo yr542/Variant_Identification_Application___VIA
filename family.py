@@ -8,6 +8,8 @@ class Family:
         self.mother = Person("","","")
         self.father = Person("","","")
         self.child = Person("","","")
+        self.hasFather = False
+        self.hasMother = False
 
 # Sibling class. Stores the string, sex, and phenotype for a sibling.
 class Person:

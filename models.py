@@ -65,7 +65,7 @@ def de_novo_model(df, fam):
     # empty data frame
     if fam.mother.affected or fam.father.affected:
         return pd.DataFrame()
-    if fam.mother.ID == "" and fam.father.ID == "":
+    if not fam.hasMother and not fam.hasFather:
         return pd.DataFrame()
    
     # filter child for all 0/1
@@ -123,13 +123,11 @@ def cmpd_het_model(df, fam):
 	# there must be at least 1 0/1 variant in mother that is not in father
 	# and at least 1 0/1 variant in father that is not in mother
         finaldf = newdf[newdf.duplicated(subset=['Gene'], keep=False)] 
-        father_available = fam.father.ID != "" 
-        mother_available = fam.mother.ID != ""
-        if(father_available or mother_available):
+        if(fam.hasFather or fam.hasMother):
             genes = finaldf["Gene"].unique()
-            both_available = father_available and mother_available
+            both_available = fam.hasFather and fam.hasMother
             if not both_available:
-                available_ID = fam.father.ID if father_available else fam.mother.ID
+                available_ID = fam.father.ID if fam.hasFather else fam.mother.ID
             for gene in genes:
                 genedf = finaldf[finaldf["Gene"]==gene]
                 if(both_available):
