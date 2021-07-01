@@ -44,11 +44,11 @@ VIA identifies variants corresponding to four models of inheritance:
 
 #### Model 1: Homozygotes/Hemizygotes (Autosomal Recessive and X-Linked)
 
-_TODO_
+Identifies variants in affected individuals who are 1/1 for a given variant. For autosomal recessive, any affected children or siblings are 1/1 and unaffected mothers and fathers are both 0/1. For x-linked, affected siblings and children are 1/1 while unaffected mothers are 0/1 and unaffected fathers are 0/0. The affected person must be male and the variant must be on the x chromosome. For x-linked de novo variants, all of the above hold true except unaffected mothers are 0/0.
 
 #### Model 2: Compound Heterozygotes
 
-_TODO_
+Identifies variants in affected individuals who are 0/1 more than or equal to 2 times in a single gene. If the parents are available, variants are only listed when they are correctly phased (one variant comes from one parent and the other from the second parent). If there are more than 2 variants in a single gene in the affected individual, only two of them need to be phased correctly for the variants to be listed.
 
 #### Model 3: De Novo
 
@@ -79,7 +79,16 @@ Each family belongs to the family class. Their characteristic attributes are:
 
 ### Custom Filters (filters.py)
 
-_TODO_
+Each of these filters are used to pull out candidate variants:
+- filter_AD(df, name, ad) - filters a DataFrame (df) by the minimum allele depth (ad) in a paricular column (name)
+- filter_DP(df, name, dp, inplace=1) - filters the DataFrame (df) by min depth in a particular column (name). If inplace is set to an integer other than 1, it will filter df into a new data frame, but by default the function filters in place.
+- filter_occurences(df, zyg, namestart, nameend, cap) - filters the DataFrame (df) by the max number of occurrences (cap) of a particular zygosity (zyg) in a range of columns
+- filter_AF(df, cap) - filters the DataFrame (df) in place by the maximum population allele frequency (cap)
+- filter_zyg(df, name, zyg) - filters the DataFrame (df) for the zygosity in a particular column (name)
+- exclude_zyg(df, name, zyg) - filters the DataFrame (df) to exclude a certain zygosity (zyg) in a particular column (name)
+- filter_benign(df) - filters the DataFrame (df) to exclude variants that are "Benign" or "Likely benign"
+- filter_DP_Max(df, names, dp, inplace=1) - filters the DataFrame (df) for variants with a maximum DP across a list of affected people (names) that is greater than the minimum value (dp), a given constant. If inplace is 1, it filters df in place; if it is not, it filters into a new DataFrame
+- filter_chr(df, chrom, exclude = False) - filters the DataFrame (df) to keep only the rows in which the gene is located in a particular chromosome (chrom)
 
 ## Change Log
 
