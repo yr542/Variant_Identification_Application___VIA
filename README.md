@@ -21,6 +21,8 @@ git clone https://github.com/anthonyozerov/variant-filtering.git
 ```
 ### Input File Formats
 
+These files should be present in the same directory as the application.
+
 #### Family Pedigree file: csv or txt
 
 This file should have the following columns in the following order:
