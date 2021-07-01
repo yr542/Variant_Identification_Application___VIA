@@ -12,11 +12,35 @@ VIA automates the process of variant identification, analyzing family data and r
 
 ## User Guide
 
+### Installation
+
 To install the application, clone this GitHub repository on your machine. If you have git installed on your computer, you can do this with the following command:
 
 ```
 git clone https://github.com/anthonyozerov/variant-filtering.git
 ```
+### Input File Formats
+
+#### Family Pedigree file: csv or txt
+
+This file should have the following columns in the following order:
+
+- *Family_ID* (i.e. FIN5)
+- *individual_ID* (i.e. FIN5.3)
+- *Status* (i.e. Mother, Father, Child, Sibling)
+- *Sex*
+- *Phenotype* (Affected OR Unaffected)
+
+#### Cleaned Annotated file: csv or txt
+
+This file should be the exact output of the Mendelian_filtering_WORK.Rmd script. Within the defined output format of this script, the important columns used by VIA are:
+
+- *Chr* (Chromosome number)
+- *AF_popmax, PopFreqMax, GME_AF, Kaviar_AF, and abraom_freq* (population allele frequencies according to a variety of sources)
+- *CLNSIG* (clinical significance of the varient, i.e. benign vs pathogenic)
+- *< Individual ID >* (each individual has a column that contains the allelic depth, the zygosity, etc. for each gene)
+
+### Running the Application
 
 The complete application can be run through main.py with the following command:
 
@@ -35,6 +59,14 @@ Any combination of these arguments can be used, and they can be chained together
 ```
 python main.py -p <file path> -d <file path> -o <file path> -f <family name>
 ```
+
+### Output File Format
+  
+VIA outputs a csv file with a row for each candidate gene for each individual. The columns are the same as the second input (the cleaned annotated file), except that there are three columns prepended:
+  
+- *inh model*: The inheritance model that the variant for that row corresponds to. (i.e. addn, xl, ad, etc.)
+- *family*: The Family ID for the individual to whom the variant for that row corresponds to (i.e. FIN5)
+- *sample*: The Individual ID for the individual to whom the variant for that row corresponds to (i.e. FIN5.3)
 
 ## Developer Guide
 
