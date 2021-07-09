@@ -21,15 +21,22 @@ git clone https://github.com/anthonyozerov/variant-filtering.git
 ```
 ### Input File Formats
 
-#### Family Pedigree file: csv or txt
+#### Family Pedigree file: csv or txt (tab-delimited)
 
 This file should have the following columns in the following order:
 
-- *Family_ID* (i.e. FIN5)
-- *individual_ID* (i.e. FIN5.3)
-- *Status* (i.e. Mother, Father, Child, Sibling)
-- *Sex*
+- *Family_ID* (e.g. FIN5)
+- *individual_ID* (e.g. FIN5.3)
+- *Status* (e.g. Mother, Father, Child, Sibling, Other)
+- *Sex* (e.g. Male, Female)
 - *Phenotype* (Affected OR Unaffected)
+
+An example would be a table like this:
+| Family_ID | individual_ID | Status | Sex    | Phenotype  |
+|-----------|---------------|--------|--------|------------|
+| FIN1      | FIN1-1        | Father | Male   | Unaffected |
+| FIN1      | FIN1-2        | Mother | Female | Unaffected |
+| FIN1      | FIN1-3        | Child  | Male   | Affected   |
 
 #### Cleaned Annotated file: csv or txt
 
@@ -64,15 +71,15 @@ python main.py -p <file path> -d <file path> -o <file path> -f <family name>
   
 VIA outputs a csv file with a row for each candidate gene for each individual. The columns are the same as the second input (the cleaned annotated file), except that there are three columns prepended:
   
-- *inh model*: The inheritance model that the variant for that row corresponds to. (i.e. addn, xl, ad, etc.)
-- *family*: The Family ID for the individual to whom the variant for that row corresponds to (i.e. FIN5)
-- *sample*: The Individual ID for the individual to whom the variant for that row corresponds to (i.e. FIN5.3)
+- *inh model*: The inheritance model(s) (comma-separated) that the variant for that row corresponds to. (e.g. addn; xl,ad; ad, etc.)
+- *family*: The Family ID for the individual to whom the variant for that row corresponds to (e.g. FIN5).
+- *sample*: The Individual ID for the individual(s) to whom the variant for that row corresponds to (e.g. FIN5.3). Note that the individuals will appear in the same order as their corresponding inheritance models. So if the inheritance models are "xl,ad", and the individuals are "A,B", then the variant is under an xl inheritance model for A and an ad inheritance model for B.
 
 ## Developer Guide
 
 ### The Models (models.py)
 
-VIA identifies variants corresponding to four models of inheritance:
+VIA identifies variants corresponding to four models of inheritance. Note that, for affected singletons, addn and ad are not shown.
 
 #### Model 1: Homozygotes/Hemizygotes (Autosomal Recessive and X-Linked)
 
@@ -84,11 +91,11 @@ Identifies variants in affected individuals who are 0/1 more than or equal to 2 
 
 #### Model 3: De Novo
 
-Identifies variants in affected children/siblings which are not present in either parent. Variants with an allele frequency greater than 0.0005 or a low allelic depth are removed.
+Identifies variants in affected children/siblings which are not present in either parent. Variants with an allele frequency greater than 0.0005 or a low coverage depth (<6) are removed.
 
 #### Model 4: Autosomal Dominant
 
-Identifies variants in affected children/siblings when _at least one_ of the parents are also affected. Variants with an allele frequency greater than 0.0005 or a low allelic depth are removed.
+Identifies variants in affected children/siblings when _at least one_ of the parents are also affected. Variants with an allele frequency greater than 0.0005 or a low coverage depth (<6) are removed.
 
 ### Custom Classes (Family.py)
 
