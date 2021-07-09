@@ -42,7 +42,7 @@ def ad_model(df, fam):
 
     # returns an empty Data Frame if nothing should be output for this model (<= 1 affected individs
     # or they are a singleton)
-    if numAffected <= 1: or (not fam.hasFather and not fam.hasMother):
+    if numAffected <= 1 or (not fam.hasFather and not fam.hasMother):
         return pd.DataFrame()
     else:
         newdf = filter_DP_Max(newdf, names, min_allelic_depth,0)
