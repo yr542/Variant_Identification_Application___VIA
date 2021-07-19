@@ -6,6 +6,7 @@ VIA automates the process of variant identification, analyzing family data and r
 - Data Pre-Requisites
   - cleaned data file (output of Mendelian_filtering_WORK.Rmd)
   - pedigree file
+  - phenotype file (optional)
 - System Pre-Requisites
   - [git](https://git-scm.com/downloads)
   - [python](https://www.python.org/)
@@ -31,7 +32,7 @@ This file should have the following columns in the following order:
 - *Sex* (e.g. Male, Female)
 - *Phenotype* (Affected OR Unaffected)
 
-An example would be a table like this:
+An example would be a tab-delimited table like this:
 | Family_ID | individual_ID | Status | Sex    | Phenotype  |
 |-----------|---------------|--------|--------|------------|
 | FIN1      | FIN1-1        | Father | Male   | Unaffected |
@@ -47,6 +48,24 @@ This file should be the exact output of the Mendelian_filtering_WORK.Rmd script.
 - *CLNSIG* (clinical significance of the varient, i.e. benign vs pathogenic)
 - *< Individual ID >* (each individual has a column that contains the allelic depth, the zygosity, etc. for each gene)
 
+### Phenotype file: csv or txt (tab-delimited)
+
+This file should have the following columns in the following order:
+
+- *Family_ID* (e.g. FIN5)
+- *HPO* (e.g. HP:0000365)
+
+An example would be a tab-delimited table like this:
+| Family_ID | HPO                              |
+|-----------|----------------------------------|
+| FIN1      |HP:0000365                        |
+| FIN10     |HP:0001249                        |
+| FIN13     |HP:0001249,HP:0012758,HP:0000252  |
+| FIN15     |HP:0001251,HP:0001252             |
+
+Notice that when a family has multiple HPO numbers they must be separated by commas (without spaces) in the HPO column.
+
+
 ### Running the Application
 
 The complete application can be run through main.py with the following command:
@@ -60,11 +79,12 @@ For greater flexibility, there are also the following optional arguments:
 - **_--data_  OR _-d_** : specify the absolute or relative path to the cleaned data file. If no argument is specified, the application will look for a file named _Test_cleaned.txt_ in the repository's directory
 - **_--output_ OR _-o_** : specify the file name (including extension and (optionally) the file path) for the ouput file. If no argument is specified, the application will name the output file _filtered.csv_ and place it in the repository's directory
 - **_--family_ OR _-f_** : specify a certain family to output an individual csv file for. The default behaviour is to produce a single output file with variants for all families.
+- **_--phenfile_ or _-ph_** : specify the absolute or relative path to the phenotype file. If no argument is specified, the application will look for a file named _Test_Phen.txt_ in the repository's directory
 
-Any combination of these arguments can be used, and they can be chained together. For example, using all four would look like:
+Any combination of these arguments can be used, and they can be chained together. For example, using all five would look like:
 
 ```
-python main.py -p <file path> -d <file path> -o <file path> -f <family name>
+python main.py -p <file path> -d <file path> -o <file path> -f <family name> -ph <file path>
 ```
 
 ### Output File Format
