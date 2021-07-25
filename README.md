@@ -82,7 +82,7 @@ For greater flexibility, there are also the following optional arguments:
 - **_--family_ OR _-f_** : specify a certain family to output an individual csv file for. The default behaviour is to produce a single output file with variants for all families.
 - **_--phenfile_ or _-ph_** : specify the absolute or relative path to the phenotype file. If no argument is specified, the application will look for a file named _Test_Phen.txt_ in the repository's directory
 - **_--mapfile_ or _-m_** : specify the absolute or relative path to the phenotype-to-gene mapping file. If no argument is specified, the application will look for a file named _phenotype_to_genes.txt_ in the repository's directory. If no such file exists, the user is be prompted to download one.
-- **_--nophen: specify that no phenotype filtering will be performed
+- **_--nophen_**: specify that no phenotype filtering will be performed.
 
 Any combination of these arguments can be used, and they can be chained together. For example, using all five would look like:
 

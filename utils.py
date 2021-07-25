@@ -40,7 +40,9 @@ def load_phen(families, phenfile, mapfile):
         if answer=="y":
             import urllib.request
             url = "https://ci.monarchinitiative.org/view/hpo/job/hpo.annotations/lastSuccessfulBuild/artifact/rare-diseases/util/annotation/phenotype_to_genes.txt"
+            print("Downloading now. It might take a while...")
             urllib.request.urlretrieve(url,mapfile)
+            print("Finished downloading.")
         else:
             print("exiting now")
             exit()
