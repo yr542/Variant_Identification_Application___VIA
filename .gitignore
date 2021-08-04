@@ -1,3 +1,10 @@
+*.txt
+*.csv
+bin
+pyvenv.cfg
+lib64
+.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
