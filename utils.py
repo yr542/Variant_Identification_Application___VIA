@@ -224,6 +224,10 @@ def filter_family(df, fam, phenfilter):
 
     # additionally apply the phenotype filter if requested
     if phenfilter:
+        if len(fam.genes) == 0:
+            print("Warning: no phenotypes listed for", fam.ID, "in the phenotype file,")
+            print("         or no associated genes found.")
+            print("         Phenotype filter will remove all variants.")
         combined = filter_phen(combined, fam)
 
     # print helpful output
