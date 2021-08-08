@@ -113,21 +113,37 @@ def filter_chr(df, chrom, exclude = False):
             df=df[df["Chr"].str.contains(chrom)]
     return df
 
+# get which gene in a string of genes (genestring) separated by ;
+# is in a list of genes (famgenes), or -1 if none are
+def gene_in_list(genestring, famgenes):
+    genes = genestring.split(';')
+    for i in range(0, len(genes)):
+        if genes[i] in famgenes:
+            return i
+    return -1
+
 # filter the dataframe for only variants in genes associated with the Family
 # object's (fam)'s phenotype
 def filter_phen(df, fam):
     if len(fam.genes) == 0:
         return pd.DataFrame()
 
-    # create a regex string to find rows containing one of the genes
-    gene_regex = r'\b(?:{})\b'.format('|'.join(fam.genes))
+    # get which gene in every gene string is in fam.genes
+    gene_locs = [gene_in_list(gene,fam.genes) for gene in df["Gene.refGene"].astype(str)]
+    # get a list of booleans:
+    # True if a gene in a gene string is in fam.genes, False otherwise
+    subset = [num != -1 for num in gene_locs]
 
-    # filter the dataframe to only get rows containing one of the genes
-    df = df[df["Gene.refGene"].str.contains(gene_regex)]
+    # filter the dataframe by the subset
+    df = df[subset]
+
+    # shrink the gene_locs list to only include filtered values
+    gene_locs =  [loc for (loc, include) in zip(gene_locs, subset) if include]
 
     # use the Family's genes-to-n-associated-phenotypes dict to get a list of
-    # counts of associated phenotypes for each of the rows
-    counts = [fam.genes[gene.split(";")[0]] for gene in df["Gene.refGene"]]
+    # counts of associated phenotypes for each of the rows.
+    # the gene identified by gene_locs is the one passed into the dict.
+    counts = [fam.genes[gene.split(";")[loc]] for gene,loc in zip(df["Gene.refGene"],gene_locs)]
 
     # insert a column containing these counts
     df.insert(3, "phens_matched", counts)

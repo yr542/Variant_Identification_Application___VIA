@@ -211,6 +211,10 @@ def filter_family(df, fam, phenfilter):
     # empty dataframe for results in this family
     famresult = pd.DataFrame()
 
+    if phenfilter and len(fam.genes) == 0:
+        print("Warning: no phenotypes listed for", fam.ID, "in the phenotype file,")
+        return famresult
+
     # add model results for each subfamily
     for subfam in subfamilies:
         famresult = pd.concat([famresult, ad_model(df, subfam, include_singleton = phenfilter)])
@@ -220,20 +224,16 @@ def filter_family(df, fam, phenfilter):
         famresult = pd.concat([famresult, de_novo_model(df, subfam, include_singleton = phenfilter)])
         famresult = pd.concat([famresult, cmpd_het_model(df, subfam)])
     # combine multiple instances of the same variant into one row
-    combined = combine_duplicates(famresult)
+    famresult = combine_duplicates(famresult)
 
     # additionally apply the phenotype filter if requested
     if phenfilter:
-        if len(fam.genes) == 0:
-            print("Warning: no phenotypes listed for", fam.ID, "in the phenotype file,")
-            print("         or no associated genes found.")
-            print("         Phenotype filter will remove all variants.")
-        combined = filter_phen(combined, fam)
+        famresult = filter_phen(famresult, fam)
 
     # print helpful output
     phenfilterstring = 'with   ' if phenfilter else 'without'
-    number = '{0:4d}'.format(len(combined))
+    number = '{0:4d}'.format(len(famresult))
     print(number,'candidates',phenfilterstring,'phenotype filter')
 
     # return the result
-    return combined
+    return famresult
