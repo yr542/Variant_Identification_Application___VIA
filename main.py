@@ -16,12 +16,16 @@ if __name__ == '__main__':
 
     args = argp.parse_args()
 
+    # get a dict of families from the pedfile
     families = get_families(args.pedfile)
 
     
     if not args.nophen:
+        print("Getting relevant genes for family phenotypes...")
+        # give each family a list of genes relevant to their phenotype
         load_phen(families, args.phenfile, args.mapfile)
-                
+
+    # read in the file containing variants
     df = pd.read_csv(args.data, sep='\t')
 
     # csv with variants in one family
@@ -34,16 +38,25 @@ if __name__ == '__main__':
         fam_variants.to_csv(fam.ID + ".csv")
 
 
+    # empty dataframes for results with and without phenotype filter
     result = pd.DataFrame()
     result_p = pd.DataFrame()
 
     for fam in families.values():
 
+        print("Filtering", fam.ID + '...')
+
+        # get a dataframe of variants for the family,
+        # without phenotype filter
         famresult = filter_family(df, fam, phenfilter = False)
+        # append it to the results
         result = pd.concat([result,famresult])
 
         if not args.nophen:
+            # get a dataframe of variants for the family,
+            # with phenotype filter
             famresult_p = filter_family(df, fam, phenfilter = True)
+            # append it to the results
             result_p = pd.concat([result_p,famresult_p])
 
     # organize result first by sample and then by inh model
@@ -52,6 +65,7 @@ if __name__ == '__main__':
     result.to_csv(args.output)
     print(result)
 
+    #save result with phenotype filter
     if not args.nophen:
         result_p = result_p.sort_values(['family','phens_matched','sample'])
         result_p.to_csv(args.output_phen)

@@ -113,11 +113,23 @@ def filter_chr(df, chrom, exclude = False):
             df=df[df["Chr"].str.contains(chrom)]
     return df
 
+# filter the dataframe for only variants in genes associated with the Family
+# object's (fam)'s phenotype
 def filter_phen(df, fam):
     if len(fam.genes) == 0:
         return pd.DataFrame()
+
+    # create a regex string to find rows containing one of the genes
     gene_regex = r'\b(?:{})\b'.format('|'.join(fam.genes))
+
+    # filter the dataframe to only get rows containing one of the genes
     df = df[df["Gene.refGene"].str.contains(gene_regex)]
+
+    # use the Family's genes-to-n-associated-phenotypes dict to get a list of
+    # counts of associated phenotypes for each of the rows
     counts = [fam.genes[gene.split(";")[0]] for gene in df["Gene.refGene"]]
+
+    # insert a column containing these counts
     df.insert(3, "phens_matched", counts)
+
     return df
