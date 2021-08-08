@@ -114,8 +114,9 @@ def filter_chr(df, chrom, exclude = False):
     return df
 
 def filter_phen(df, fam):
+    if len(fam.genes) == 0:
+        return pd.DataFrame()
     gene_regex = r'\b(?:{})\b'.format('|'.join(fam.genes))
-    #print(gene_regex)
     df = df[df["Gene.refGene"].str.contains(gene_regex)]
     counts = [fam.genes[gene.split(";")[0]] for gene in df["Gene.refGene"]]
     df.insert(3, "phens_matched", counts)

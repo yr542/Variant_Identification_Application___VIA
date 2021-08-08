@@ -25,7 +25,7 @@ def add_columns(df, fam, model):
 
 # ad_model takes in a data frame and Family object and returns a new data frame
 # containing candidate variants
-def ad_model(df, fam):
+def ad_model(df, fam, include_singleton = False):
     min_allelic_depth = 6  # will filter for 6x coverage minimum for at least one affected individ
     numAffected = 0
     newdf = df.copy()
@@ -42,8 +42,10 @@ def ad_model(df, fam):
 
     # returns an empty Data Frame if nothing should be output for this model (<= 1 affected individs
     # or they are a singleton)
-    if numAffected <= 1 or (not fam.hasFather and not fam.hasMother):
-        return pd.DataFrame()
+    noparents = not fam.hasFather and not fam.hasMother
+
+    if numAffected == 0: return pd.DataFrame()
+    elif not include_singleton and noparents: return pd.DataFrame()
     else:
         newdf = filter_DP_Max(newdf, names, min_allelic_depth,0)
         add_columns(newdf, fam, "ad")  # adds on columns with family info
@@ -52,7 +54,7 @@ def ad_model(df, fam):
 # de_novo_model takes a dataframe (the cleaned data) and a family object
 # return value: a new dataframe with all possible de novo candidate
 # genes
-def de_novo_model(df, fam):
+def de_novo_model(df, fam, include_singleton = False):
 
     # re-filter for MAF
     revised_df = df.copy()
@@ -66,7 +68,9 @@ def de_novo_model(df, fam):
     # empty data frame
     if fam.mother.affected or fam.father.affected:
         return pd.DataFrame()
-    if not fam.hasMother and not fam.hasFather:
+
+    noparents = not fam.hasMother and not fam.hasFather
+    if noparents and not include_singleton:
         return pd.DataFrame()
    
     # filter child for all 0/1

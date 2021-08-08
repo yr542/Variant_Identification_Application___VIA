@@ -1,7 +1,6 @@
 import argparse
 import pandas as pd
 from family import *
-from models import *
 from utils import *
 
 if __name__ == '__main__':
@@ -40,26 +39,12 @@ if __name__ == '__main__':
 
     for fam in families.values():
 
-        # generate a list of subfamilies centered on each affected individual
-        subfamilies = generate_subfamilies(fam)
-
-        # empty dataframe for results in this family
-        famresult = pd.DataFrame()
-        # add model results for each subfamily
-        for subfam in subfamilies:
-            famresult = pd.concat([famresult, ad_model(df, subfam)])
-            famresult = pd.concat([famresult, ar_model(df, subfam)])
-            famresult = pd.concat([famresult, xl_model(df, subfam)])
-            famresult = pd.concat([famresult, xldn_model(df, subfam)])
-            famresult = pd.concat([famresult, de_novo_model(df, subfam)])
-            famresult = pd.concat([famresult, cmpd_het_model(df, subfam)])
-
-        combined = combine_duplicates(famresult)
-        result = pd.concat([result, combined])
+        famresult = filter_family(df, fam, phenfilter = False)
+        result = pd.concat([result,famresult])
 
         if not args.nophen:
-            combined = filter_phen(combined, fam)
-            result_p = pd.concat([result_p, combined])
+            famresult_p = filter_family(df, fam, phenfilter = True)
+            result_p = pd.concat([result_p,famresult_p])
 
     # organize result first by sample and then by inh model
     result = result.sort_values(['sample', 'inh model'])

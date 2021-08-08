@@ -1,5 +1,6 @@
 import pandas as pd
 from family import *
+from models import *
 
 def get_families(pedfile):
     pedDf = pd.read_csv(pedfile, sep='\t')
@@ -60,7 +61,6 @@ def load_phen(families, phenfile, mapfile):
                 hpo = phenDf["HPO"][i]
                 fam = families.get(j)
                 fam.HPO = hpo.split(',')
-                fam.genes = {}
                 for HPO in fam.HPO:
                     genes = phen_to_genes[phen_to_genes["HPO-id"]==HPO]['gene-symbol'].tolist()
                     gene_nums = [fam.genes[gene]+1 if gene in fam.genes else 1 for gene in genes]
@@ -114,4 +114,25 @@ def combine_duplicates(df):
         output["inh model"] = [modelstring]
         del (output["loc"])
         combined = pd.concat([combined, output])
+    return combined
+
+def filter_family(df, fam, phenfilter):
+
+    #generate a list of subfamilies centered on each affected individual
+    subfamilies = generate_subfamilies(fam)
+
+    #empty dataframe for results in this family
+    famresult = pd.DataFrame()
+    # add model results for each subfamily
+    for subfam in subfamilies:
+        famresult = pd.concat([famresult, ad_model(df, subfam, include_singleton = phenfilter)])
+        famresult = pd.concat([famresult, ar_model(df, subfam)])
+        famresult = pd.concat([famresult, xl_model(df, subfam)])
+        famresult = pd.concat([famresult, xldn_model(df, subfam)])
+        famresult = pd.concat([famresult, de_novo_model(df, subfam, include_singleton = phenfilter)])
+        famresult = pd.concat([famresult, cmpd_het_model(df, subfam)])
+    combined = combine_duplicates(famresult)
+
+    if phenfilter:
+        combined = filter_phen(combined, fam)
     return combined
