@@ -107,6 +107,21 @@ def load_phen(families, phenfile, mapfile):
                 # numbers of phenotypes
                 fam.genes.update(dict(zip(genes, gene_nums)))
 
+# Checks that DP is in every row in the FORMAT column
+def verify(df):
+    # get boolean series, with True if a row is bad
+    badrows = ~df["FORMAT"].str.contains("DP")
+
+    if any(badrows):
+        print("The following rows do not contain 'DP' in their 'FORMAT' column:")
+        # print indices as they would appear in spreadsheet software
+        print([idx + 2 for idx in df[badrows].index])
+        # remove the bad rows from the df
+        df = df[~badrows]
+        print("They will not be considered.")
+
+    return df
+
 # generate a list of subfamilies centered on every affected individual in the
 # Family object (fam)
 def generate_subfamilies(fam):
@@ -129,7 +144,7 @@ def generate_subfamilies(fam):
                 opposite = fam.mother if person == fam.father else fam.father
 
             # if the person is a sibling in the original family,
-            # then we give thus subfamily the same parents,
+            # then we give this subfamily the same parents,
             # and a list of siblings including all of the siblings
             # in the original family that are not this person, as well
             # as the child in the original family
@@ -212,7 +227,7 @@ def filter_family(df, fam, phenfilter):
     famresult = pd.DataFrame()
 
     if phenfilter and len(fam.genes) == 0:
-        print("Warning: no phenotypes listed for", fam.ID, "in the phenotype file,")
+        print("Warning: no phenotypes listed for", fam.ID, "in the phenotype file.")
         return famresult
 
     # add model results for each subfamily

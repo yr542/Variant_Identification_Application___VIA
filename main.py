@@ -27,6 +27,8 @@ if __name__ == '__main__':
 
     # read in the file containing variants
     df = pd.read_csv(args.data, sep='\t')
+    #check that there are no errors, and remove rows with errors.
+    df = verify(df)
 
     # csv with variants in one family
     if args.family != "":
