@@ -11,6 +11,7 @@ class Family:
         self.hasFather = False
         self.hasMother = False
         self.HPO = []
+        self.genes = {}
 
 # Sibling class. Stores the string, sex, and phenotype for a sibling.
 class Person:

@@ -1,7 +1,6 @@
 import argparse
 import pandas as pd
 from family import *
-from models import *
 from utils import *
 
 if __name__ == '__main__':
@@ -17,13 +16,19 @@ if __name__ == '__main__':
 
     args = argp.parse_args()
 
+    # get a dict of families from the pedfile
     families = get_families(args.pedfile)
 
     
     if not args.nophen:
+        print("Getting relevant genes for family phenotypes...")
+        # give each family a list of genes relevant to their phenotype
         load_phen(families, args.phenfile, args.mapfile)
-                
+
+    # read in the file containing variants
     df = pd.read_csv(args.data, sep='\t')
+    #check that there are no errors, and remove rows with errors.
+    df = verify(df)
 
     # csv with variants in one family
     if args.family != "":
@@ -35,31 +40,26 @@ if __name__ == '__main__':
         fam_variants.to_csv(fam.ID + ".csv")
 
 
+    # empty dataframes for results with and without phenotype filter
     result = pd.DataFrame()
     result_p = pd.DataFrame()
 
     for fam in families.values():
 
-        # generate a list of subfamilies centered on each affected individual
-        subfamilies = generate_subfamilies(fam)
+        print("Filtering", fam.ID + '...')
 
-        # empty dataframe for results in this family
-        famresult = pd.DataFrame()
-        # add model results for each subfamily
-        for subfam in subfamilies:
-            famresult = pd.concat([famresult, ad_model(df, subfam)])
-            famresult = pd.concat([famresult, ar_model(df, subfam)])
-            famresult = pd.concat([famresult, xl_model(df, subfam)])
-            famresult = pd.concat([famresult, xldn_model(df, subfam)])
-            famresult = pd.concat([famresult, de_novo_model(df, subfam)])
-            famresult = pd.concat([famresult, cmpd_het_model(df, subfam)])
-
-        combined = combine_duplicates(famresult)
-        result = pd.concat([result, combined])
+        # get a dataframe of variants for the family,
+        # without phenotype filter
+        famresult = filter_family(df, fam, phenfilter = False)
+        # append it to the results
+        result = pd.concat([result,famresult])
 
         if not args.nophen:
-            combined = filter_phen(combined, fam)
-            result_p = pd.concat([result_p, combined])
+            # get a dataframe of variants for the family,
+            # with phenotype filter
+            famresult_p = filter_family(df, fam, phenfilter = True)
+            # append it to the results
+            result_p = pd.concat([result_p,famresult_p])
 
     # organize result first by sample and then by inh model
     result = result.sort_values(['sample', 'inh model'])
@@ -67,6 +67,7 @@ if __name__ == '__main__':
     result.to_csv(args.output)
     print(result)
 
+    #save result with phenotype filter
     if not args.nophen:
         result_p = result_p.sort_values(['family','phens_matched','sample'])
         result_p.to_csv(args.output_phen)

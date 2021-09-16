@@ -65,6 +65,12 @@ An example would be a tab-delimited table like this:
 
 Notice that when a family has multiple HPO numbers they must be separated by commas (without spaces) in the HPO column.
 
+### Phenotype HPO Ref file: txt (tab-delimited)
+
+This file corresponds to the mapfile input. It should be the latest _phenotype_to_genes.txt_ file from HPO, which can be found at https://hpo.jax.org/app/download/annotation. This file updates every 2 months so the user should check that they have the most updated version of the file in their repository to get the most accurate and current results. Once this file is downloaded it should be in the format compatible with this application without any changes needing to be made.
+
+
+
 
 ### Running the Application
 
@@ -92,11 +98,13 @@ python main.py -p <file path> -d <file path> -o <file path> -f <family name> -ph
 
 ### Output File Format
   
-VIA outputs a csv file with a row for each candidate gene for each individual. The columns are the same as the second input (the cleaned annotated file), except that there are three columns prepended:
+VIA outputs two csv files with a row for each candidate gene for each individual. In both files the columns are the same as the second input (the cleaned annotated file), except that there are three columns prepended:
   
 - *inh model*: The inheritance model(s) (comma-separated) that the variant for that row corresponds to. (e.g. addn; xl,ad; ad, etc.)
 - *family*: The Family ID for the individual to whom the variant for that row corresponds to (e.g. FIN5).
-- *sample*: The Individual ID for the individual(s) to whom the variant for that row corresponds to (e.g. FIN5.3). Note that the individuals will appear in the same order as their corresponding inheritance models. So if the inheritance models are "xl,ad", and the individuals are "A,B", then the variant is under an xl inheritance model for A and an ad inheritance model for B.
+- *sample*: The Individual ID for the individual(s) to whom the variant for that row corresponds to (e.g. FIN5.3). Note that the individuals will appear in the same order as their corresponding inheritance models. So if the inheritance models are "xl,ad", and the individuals are "A,B", then the variant is under an xl inheritance model for A and an ad inheritance model for B.'
+
+The first csv file simply has all of the candidate genes for each individual without taking into account the HPO terms. The candidate genes are sorted first in order of sample and then in order of inh model. The second csv file has all of the candidate genes for each individual that also match the phenotype of the affected individuals. The second file also sorts the output in order of family, then in order of the number of HPO terms each candidate 'matches' for a family, then in order of sample. Further, in the second file a column containing the number of HPO terms matched by each candidate is included after the file containing the sample number (so it is the fourth column).
 
 ## Developer Guide
 
