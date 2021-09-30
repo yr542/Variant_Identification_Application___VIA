@@ -106,6 +106,8 @@ VIA outputs two csv files with a row for each candidate gene for each individual
 
 The first csv file simply has all of the candidate genes for each individual without taking into account the HPO terms. The candidate genes are sorted first in order of sample and then in order of inh model. The second csv file has all of the candidate genes for each individual that also match the phenotype of the affected individuals. The second file also sorts the output in order of family, then in order of the number of HPO terms each candidate 'matches' for a family, then in order of sample. Further, in the second file a column containing the number of HPO terms matched by each candidate is included after the file containing the sample number (so it is the fourth column).
 
+Note: the 'ad, addn' model is not shown for affected individuals with no parents (singletons with or without sibs) in the full output, but will be shown in the 'phen' output.
+
 ## Developer Guide
 
 ### The Models (models.py)
