@@ -166,3 +166,4 @@ Each of these filters are used to pull out candidate variants:
 
 ### 0.1.x
 - 0.1.0: First release (06.11.2021)
+- 0.1.1: Updated to allow hemizygous HG38 X-linked calls (1:) and removed PopFreqMax for HG38 switch (01.20.2022)
