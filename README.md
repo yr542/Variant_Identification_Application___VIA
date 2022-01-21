@@ -11,6 +11,12 @@ VIA automates the process of variant identification, analyzing family data and r
   - [git](https://git-scm.com/downloads)
   - [python](https://www.python.org/)
 
+Notes on cleaned data file:
+- Remove shifted rows from Annovar output (typically 1-10 in large file; check Otherinfo10; should all be .)
+- Add headers with sample names (from VCF file)
+- Replace all 0|1, 1|1 and 0|0 with 0/1, 1/1 and 0/0
+
+
 ## User Guide
 
 ### Installation
