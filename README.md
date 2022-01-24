@@ -24,7 +24,7 @@ Notes on cleaned data file:
 To install the application, clone this GitHub repository on your machine. If you have git installed on your computer, you can do this with the following command:
 
 ```
-git clone https://github.com/anthonyozerov/variant-filtering.git
+git clone https://github.com/ischrauwen-lab/variant-filtering.git
 ```
 ### Input File Formats
 
