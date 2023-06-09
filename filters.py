@@ -121,11 +121,11 @@ def filter_DP_Max(df, names, dp, inplace=1):
 def filter_chr(df, chrom, exclude = False):
     if "Chr" in df.columns:
         if exclude:
-            #df=df[~df["Chr"].str.contains(chrom)] ########################OLD#########################
+            
             df = df[~df["Chr"].astype(str).str.contains(chrom)]
 
         else:
-            # df=df[df["Chr"].str.contains(chrom)] ########################OLD#########################
+            
             df = df[~df["Chr"].isna() & df["Chr"].str.contains(chrom)]
     return df
 
