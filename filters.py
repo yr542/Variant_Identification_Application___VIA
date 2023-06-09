@@ -125,7 +125,8 @@ def filter_chr(df, chrom, exclude = False):
             df = df[~df["Chr"].astype(str).str.contains(chrom)]
 
         else:
-            df=df[df["Chr"].str.contains(chrom)]
+            # df=df[df["Chr"].str.contains(chrom)] ########################OLD#########################
+            df = df[~df["Chr"].isna() & df["Chr"].str.contains(chrom)]
     return df
 
 # get which gene in a string of genes (genestring) separated by ;
