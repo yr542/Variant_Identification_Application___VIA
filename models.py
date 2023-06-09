@@ -169,7 +169,7 @@ def xl_model(df, fam):
         if person.unaffected:
             x_df_1 = exclude_zyg(x_df, person.ID, "1/1")
             x_df_2 = exclude_1x_zyg(x_df, person.ID, "1:")
-            x_df = x_df_1.append(x_df_2)
+            x_df = x_df_1._append(x_df_2)
             if person.male:
                 x_df_1 = filter_zyg(x_df, person.ID, "0/0")
                 x_df_2 = filter_1x_zyg(x_df, person.ID, "0:")
