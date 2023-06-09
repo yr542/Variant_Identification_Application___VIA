@@ -65,7 +65,7 @@ def load_phen(families, phenfile, mapfile):
         if answer=="y":
             # download the mapfile
             import urllib.request
-            url = "https://ci.monarchinitiative.org/view/hpo/job/hpo.annotations/lastSuccessfulBuild/artifact/rare-diseases/util/annotation/phenotype_to_genes.txt"
+            url = "http://purl.obolibrary.org/obo/hp/hpoa/phenotype_to_genes.txt"
             print("Downloading now. It might take a while...")
             urllib.request.urlretrieve(url,mapfile)
             print("Finished downloading.")
@@ -77,9 +77,9 @@ def load_phen(families, phenfile, mapfile):
     phen_to_genes = pd.read_csv(mapfile, sep = '\t', header = None, comment = '#')
 
     # rename the columns of the dataframe
+    ########################################################### Removed `"additional-info","source"`######################################
     phen_to_genes.columns = ["HPO-id", "HPO label", "gene-id",
-            "gene-symbol", "additional-info",
-            "source", "disease-ID"]
+            "gene-symbol", "disease-ID"]
 
     # read the phenfile into a dataframe
     phenDf = pd.read_csv(phenfile, sep='\t')
