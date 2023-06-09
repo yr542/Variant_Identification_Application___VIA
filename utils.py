@@ -173,7 +173,7 @@ def combine_duplicates(df):
     # use a generated location string to determine if two variants
     # are the same or not. These location strings should be different
     # if and only if the two variants are different
-    df["loc"] = [chrom + str(start) + str(end) for chrom, start, end in
+    df["loc"] = [str(chrom) + str(start) + str(end) for chrom, start, end in
                         zip(df['Chr'], df['Start'], df["End"])]
 
     # get a list of the unique location strings

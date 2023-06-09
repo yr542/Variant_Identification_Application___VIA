@@ -20,7 +20,16 @@ def filter_AD(df, name, ad):
 def filter_DP(df, name, dp, inplace=1):
     strings = np.array(df[name])
     DPindices=[s.split(":").index("DP") for s in df["FORMAT"]]
-    DPs=[int(strings[i].split(":")[DPindices[i]]) for i in range(len(strings))]
+    #DPs=[int(strings[i].split(":")[DPindices[i]]) for i in range(len(strings))]#######OLD###################
+    DPs = []
+    for i in range(len(strings)):
+        try:
+            dp_value = int(strings[i].split(":")[DPindices[i]])
+            DPs.append(dp_value)
+        except ValueError:
+            # Handle the case where the value is not a valid integer
+            DPs.append(0)  # or any other appropriate handling logic
+
     df["DP"]=DPs
     if inplace == 1:
         df=df[df["DP"] >= dp].copy()
