@@ -4,7 +4,7 @@ VIA automates the process of variant identification, analyzing family data and r
 
 ## Application Pre-Requisites
 - Data Pre-Requisites
-  - cleaned data file (output of Mendelian_filtering_WORK.Rmd)
+  - cleaned data file (output of Step 4 Post Processing)
   - pedigree file
   - phenotype file (optional)
 - System Pre-Requisites
@@ -24,7 +24,7 @@ Notes on cleaned data file:
 To install the application, clone this GitHub repository on your machine. If you have git installed on your computer, you can do this with the following command:
 
 ```
-git clone https://github.com/ischrauwen-lab/variant-filtering.git
+git clone https://github.com/yr542/variant-filtering.git
 ```
 ### Input File Formats
 
