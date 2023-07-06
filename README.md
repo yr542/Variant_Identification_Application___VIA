@@ -167,9 +167,3 @@ Each of these filters are used to pull out candidate variants:
 - filter_benign(df) - filters the DataFrame (df) to exclude variants that are "Benign" or "Likely benign". This filter is not used in any of the models.
 - filter_DP_Max(df, names, dp, inplace=1) - filters the DataFrame (df) for variants with a maximum DP across a list of affected people (names) that is greater than the minimum value (dp), a given constant. If inplace is 1, it filters df in place; if it is not, it filters into a new DataFrame
 - filter_chr(df, chrom, exclude = False) - filters the DataFrame (df) to keep only the rows in which the gene is located in a particular chromosome (chrom)
-
-## Change Log
-
-### 0.1.x
-- 0.1.0: First release (06.11.2021)
-- 0.1.1: Updated to allow hemizygous HG38 X-linked calls (1:) and removed PopFreqMax for HG38 switch (01.20.2022)
