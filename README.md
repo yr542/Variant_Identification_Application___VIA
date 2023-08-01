@@ -73,7 +73,7 @@ Notice that when a family has multiple HPO numbers they must be separated by com
 
 ### Phenotype HPO Ref file: txt (tab-delimited)
 
-This file corresponds to the mapfile input. It should be the latest _phenotype_to_genes.txt_ file from HPO, which can be found at https://hpo.jax.org/app/download/annotation. This file updates every 2 months so the user should check that they have the most updated version of the file in their repository to get the most accurate and current results. Once this file is downloaded it should be in the format compatible with this application without any changes needing to be made.
+This file corresponds to the mapfile input. It should be the latest _phenotype_to_genes.txt_ file from HPO, which can be found at [https://hpo.jax.org/app/download/annotation](https://hpo.jax.org/app/data/annotations). This file updates every 2 months so the user should check that they have the most updated version of the file in their repository to get the most accurate and current results. Once this file is downloaded it should be in the format compatible with this application without any changes needing to be made.
 
 
 
