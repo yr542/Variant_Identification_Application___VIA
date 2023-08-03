@@ -1,6 +1,7 @@
 # Variant Identification Application (VIA)
 
-VIA automates the process of variant identification, analyzing family data and returning possible candidates based on a range of specific filters and models of inheritance.
+* VIA automates the process of variant identification, analyzing family data and returning possible candidates based on a range of specific filters and models of inheritance.
+* The phenotype to genes file is an old version that has 7 columns. It is added here as a compressed file that will need to be decompressed to be used.
 
 ## Application Pre-Requisites
 - Data Pre-Requisites
