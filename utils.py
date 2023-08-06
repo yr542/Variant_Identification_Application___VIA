@@ -76,10 +76,10 @@ def load_phen(families, phenfile, mapfile):
     # read the mapfile into a dataframe
     phen_to_genes = pd.read_csv(mapfile, sep = '\t', header = None, comment = '#')
 
-    # rename the columns of the dataframe
-    ########################################################### Removed `"additional-info","source"`######################################
+        # rename the columns of the dataframe
     phen_to_genes.columns = ["HPO-id", "HPO label", "gene-id",
-            "gene-symbol", "disease-ID"]
+            "gene-symbol", "additional-info",
+            "source", "disease-ID"]
 
     # read the phenfile into a dataframe
     phenDf = pd.read_csv(phenfile, sep='\t')
