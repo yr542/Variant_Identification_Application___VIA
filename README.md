@@ -2,6 +2,7 @@
 
 * VIA automates the process of variant identification, analyzing family data and returning possible candidates based on a range of specific filters and models of inheritance.
 * The phenotype to genes file is an old version that has 7 columns. It is added here as a compressed file that will need to be decompressed to be used.
+  * For those on the CUMC HPC the unzipped phenotype to genes file is available upon request.
 
 ## Application Pre-Requisites
 - Data Pre-Requisites
@@ -33,8 +34,8 @@ git clone https://github.com/yr542/variant-filtering.git
 
 This file should have the following columns in the following order:
 
-- *Family_ID* (e.g. FIN5)
-- *individual_ID* (e.g. FIN5.3)
+- *Family_ID* (e.g. FIN1)
+- *individual_ID* (e.g. FIN1.2)
 - *Status* (e.g. Mother, Father, Child, Sibling, Other)
 - *Sex* (e.g. Male, Female)
 - *Phenotype* (Affected OR Unaffected)
